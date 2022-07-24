@@ -1,5 +1,5 @@
 import { Avatar, Badge, Button, Col, Drawer, Dropdown, Empty, Layout, Menu, Row } from 'antd';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { UserOutlined, DownOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { AppContext } from '../Context.js';
@@ -9,10 +9,45 @@ import logo from '../../images/logo.png'
 const { Header, Content, Footer } = Layout;
 
 const Client = () => {
+  const [selected, setSelected] = useState('');
+  useEffect(() => {
+    var path = window.location.pathname;
+    if(path != null && path != "") {
+      setSelected(path.substring(1, path.length));
+    } else {
+      setSelected('home')
+    };
+    
+  },[])
+
+  const menuItems = [
+    {
+      key: 'home',
+      label: <Link to='/'>Trang chủ</Link>,
+    },
+    {
+      key: 'menu',
+      label: <Link to='/menu'>Phim</Link>,
+    },
+    {
+      key: 'ticket',
+      label: <Link to='/ticket'>Mua vé</Link>,
+    },
+    {
+      key: 'about-us',
+      label: <Link to='/about-us'>Giới thiệu</Link>,
+    },
+
+  ];
+
+  const onClick = (e) => {
+    setSelected(e.key);
+  };
+
   return (
     <>
       <Layout className="layout" style={{ minHeight: '100vh' }}>
-        <Header style={{ position: 'fixed', zIndex: 1, width: '100%', background: 'rgba(250,250,250,0.8)' }}>
+        <Header style={{ position: 'fixed', zIndex: 100, width: '100%', background: 'rgba(250,250,250,1)' }}>
           <Row justify='space-between'>
               <Col span={8} >
                   <div className="logo">
@@ -20,19 +55,7 @@ const Client = () => {
                   </div>
               </Col>
               <Col  >
-                  <Menu style={{ background: 'rgba(250,250,250,0)', float: 'right'}} mode="horizontal" defaultSelectedKeys={['home']} className="menu">
-                    <Menu.Item key="home" className='nav-link active'>
-                      <Link to='/'>Trang chủ</Link>
-                    </Menu.Item>
-                    <Menu.Item key="menu" className='nav-link'>
-                      <Link to='/menu' >Phim</Link>
-                    </Menu.Item>
-                    <Menu.Item key="booking" className='nav-link'>
-                      <Link to='/booking'>Đặt vé</Link>
-                    </Menu.Item>
-                    <Menu.Item key="about" className='nav-link'>
-                      <Link to='/about-us'>Giới thiệu</Link>
-                    </Menu.Item>
+                  <Menu style={{ background: 'rgba(250,250,250, 0)', float: 'right' }} onClick={onClick} items={menuItems} mode="horizontal"  selectedKeys={selected} className="menu">
                   </Menu>
               </Col>
           </Row>
@@ -44,7 +67,7 @@ const Client = () => {
           <Outlet />  
         </Content>
 
-        <Footer style={{ textAlign: 'center' }}>FILM CENTER</Footer>
+        <Footer style={{ textAlign: 'center', zIndex: 10 }}>FILM CENTER</Footer>
 
       </Layout>
     </>

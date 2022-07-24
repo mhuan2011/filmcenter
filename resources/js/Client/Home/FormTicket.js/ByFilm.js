@@ -5,6 +5,7 @@ import { AndroidOutlined, AppleOutlined, HomeOutlined, ScheduleOutlined, VideoCa
 import { AppContext } from '../../../Context.js';
 const { TabPane } = Tabs;
 
+const {Option} = Select;
 const ByFilm = () => {
 
   return (

@@ -9,6 +9,8 @@ import { AppContext } from './Context';
 import Client from './Client/Client';
 import Home from './Client/Home';
 import Category from './Client/Category';
+import Ticket from './Client/Ticket/Ticket';
+import BookTicket from './Client/Ticket/BookTicket';
 
 
 function App() {
@@ -23,8 +25,11 @@ function App() {
               <Route path='/' element={<Client />}>
                   <Route index element={<Home />} />
                   <Route path='/category' element={<Category />} />
+                  <Route path='/ticket' element={<Ticket />}/>
+                  <Route path='/book-ticket' element={<BookTicket />}/>
               </Route>
               <Route path='/admin' element={<PrivateOutlet />}>
+             
               
               </Route>
           </Routes>

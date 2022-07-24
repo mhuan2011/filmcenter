@@ -21,14 +21,18 @@
         "react-dom": "^17.0.2",
         "resolve-url-loader": "^5.0.0",
         "sass": "^1.32.11",
-        "sass-loader": "^11.0.1"
+        "sass-loader": "^11.0.1",
+        "webpack-node-externals": "^3.0.0"
     },
     "dependencies": {
         "@ant-design/icons": "^4.7.0",
         "antd": "^4.21.5",
         "autoprefixer": "10.4.5",
+        "laravel-mix-polyfill": "^3.0.1",
+        "node-polyfill-webpack-plugin": "^2.0.0",
         "pusher": "^5.1.1-beta",
         "react-router": "^6.3.0",
-        "react-router-dom": "^6.3.0"
+        "react-router-dom": "^6.3.0",
+        "webpack": "^5.73.0"
     }
 }
