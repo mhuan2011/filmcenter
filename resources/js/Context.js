@@ -115,7 +115,46 @@ const Provider = ({ children }) => {
       dispatch({ type: actions.ADD_CART, data });
       dispatch({ type: actions.SUM_MONEY });
     },
+
+
+    //category
+    getItemCategory: (keyID) => {
+      return axios.get(`/api/category/getitem/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    getListCategory: () => {
+      return axios.get('/api/category/getlist', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    storeCategory: (values) => {
+      return axios.post('/api/category/store', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    updateCategory: (keyID, values) => {
+      return axios.post(`/api/category/update/${keyID}`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    deleteCategory: () => {
+      return axios.get('/api/category/delete/{id}', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    //person
+    getPerson: (keyID) => {
+      return axios.get(`/api/person/getitem/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    getListPerson: () => {
+      return axios.get('/api/person/getlist', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    storePerson: (values) => {
+      return axios.post('/api/person/store', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    updatePerson: (values) => {
+      return axios.post(`/api/person/update`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    deletePerson: () => {
+      return axios.get('/api/person/delete/{id}', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    }
+
+
   }
+
+  
   return (
     <AppContext.Provider value={value}>
       {children}

@@ -1,15 +1,16 @@
-import { Avatar, Card, Col, InputNumber, Row, Space, Spin, Table, Tag } from 'antd'
+import { Affix, Avatar, Card, Col, Divider, InputNumber, Row, Space, Spin, Table, Tag } from 'antd'
 import Meta from 'antd/lib/card/Meta.js';
-import { record } from 'laravel-mix/src/HotReloading.js';
 import React, { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../../../Context.js';
+import helper from '../../Helper/helper.js';
 
-const SelectTicket = () => {
+const SelectTicket = ({ticketInfor, setTicketInfor, setTotal}) => {
   const [dataSource, setDataSource] = useState([]);
   
   useEffect(() => {
     setDataSource(data);
   },[])
+
 
   var data = [
     {
@@ -30,9 +31,20 @@ const SelectTicket = () => {
     },
   ];
 
-  const updateData = (dataSource) => {
-    setDataSource(dataSource);
-    console.log("huan",dataSource);
+  const updateData = () => {
+    var totalPrice = 0;
+    var ticketType = [];
+
+    dataSource.forEach(ele => {
+      totalPrice += ele.quantity * ele.price;
+      if(ele.quantity > 0) {
+        ticketType.push(ele);
+      }
+    });
+    setTotal(totalPrice);
+    // 
+    ticketInfor.ticketType = ticketInfor;
+    setTicketInfor(ticketInfor);
   }
 
   const columns = [
@@ -53,15 +65,22 @@ const SelectTicket = () => {
         title: 'Số lượng',
         dataIndex: 'quantity',
         key: 'quantity',
-        render: (_, record) => {
+        render: (text, record, index) => {
           const onChangeQuantity = (e) => {
-            record.quantity = e;
-            record.total = e * record.price;
-            updateData(dataSource);
+            if (e != null) {
+              record.quantity = e;
+              setDataSource(
+                dataSource.map((row, i) =>
+                  i === index ? { ...record, total: record.quantity*record.price } : row
+                )
+              );
+            }     
+            updateData();
           }
             return (
             <>
-              <InputNumber defaultValue={0} min={0} onChange={onChangeQuantity} />
+              <InputNumber defaultValue={0} min={0} max={10} onChange={onChangeQuantity}
+              />
             </>
           )
         },
@@ -70,41 +89,26 @@ const SelectTicket = () => {
         title: 'Giá (VNĐ)',
         dataIndex: 'price',
         key: 'price',
+        render: (price) => (
+          <>{helper.formatCurrency(price)}</>
+        )
       },
       {
         title: 'Tổng (VNĐ)',
         key: 'total',
         dataIndex: 'total',
+        render: (total) => (
+          <>{helper.formatCurrency(total)}</>
+        )
       }
     ];
   
   return (
-      
-      <Row gutter={10} style={{padding: 10}}>
-        <Col span={18}>
-          <Card title="Chọn vé" style={{height: '100%'}}>
-            <Table columns={columns} dataSource={[...dataSource]} pagination={false} rowKey="Id"/>
-          </Card>
-        </Col>
-        <Col span={6} >
-          <Card >
-            <Card
-              style={{ width: '100%' }}
-              cover={
-                <img
-                  alt="example"
-                  src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-                />
-              }
-            >
-              <Meta
-                  title="Card title"
-                  description="This is the description"
-              />
-            </Card>
-          </Card>
-        </Col>
-      </Row>
+
+      <Card title="Chọn vé" style={{height: '100%', margin: 10}}>
+        <Table columns={columns} dataSource={[...dataSource]} pagination={false} rowKey={(record) => {return(record.type_id)}}/>
+      </Card>
+  
   )
 }
 

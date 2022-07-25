@@ -1,5 +1,7 @@
 /* global */
-
+.login {
+	float: right;
+}
 
 /* home */
 .slider-review {
@@ -256,7 +258,6 @@
 	min-height: 200px;
 	margin-top: 16px;
 	padding-top: 80px;
-	text-align: center;
 	background-color: #fafafa;
 	border: 1px dashed #e9e9e9;
 	border-radius: 2px;
@@ -272,7 +273,7 @@ margin-top: 24px;
 
 }
 
-.ant-layout-content:before {
+.test:before {
 content: ' ';
 display: block;
 position: fixed;
@@ -293,4 +294,41 @@ background: url('https://www.kinomeister.de/wp-content/uploads/2020/08/sith4.jpg
 }
 .steps-content {
 	padding: 0px;
+}
+
+.ant-divider {
+	margin: 5px;
+}
+.detail-ticket {
+	text-align: left;
+}
+.steps-content {
+	margin-top: 0;
+}
+/* seat ticket */
+.seat {
+	padding: 5px;
+	margin: 0 2px;
+	background-size: cover;
+	width: 30px;
+	cursor: pointer;
+}
+
+.select-seat {
+	width: 100%;
+	min-height: 400px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	overflow: visible;
+}
+
+.screen {
+	background-color: #2222;
+	padding: 5px;
+	width: 100%;
+	margin: 15px 0;
+	box-shadow: 0 3px 10px rgba(255, 255, 255, 0.7);
+	text-align: center;
 }

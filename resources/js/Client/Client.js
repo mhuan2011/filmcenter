@@ -9,6 +9,8 @@ import logo from '../../images/logo.png'
 const { Header, Content, Footer } = Layout;
 
 const Client = () => {
+  const { user } = useContext(AppContext);
+  
   const [selected, setSelected] = useState('');
   useEffect(() => {
     var path = window.location.pathname;
@@ -40,6 +42,26 @@ const Client = () => {
 
   ];
 
+
+  const dropDownItem = [
+    {
+      key: '1',
+      label: <Link to='/me'>Thông tin cá nhân</Link>,
+    },
+    {
+      key: '2',
+      label: <Link to='/history'>Lịch sử đặt vé</Link>,
+    },
+    {
+      key: '3',
+      label: <Link to='/logout'>Đăng xuất</Link>,
+    },
+  ]
+  const menu = (
+    <Menu items={dropDownItem} >
+    </Menu>
+  );
+
   const onClick = (e) => {
     setSelected(e.key);
   };
@@ -54,10 +76,31 @@ const Client = () => {
                     <Link to='/'><img src={logo} alt=""/></Link>
                   </div>
               </Col>
-              <Col  >
-                  <Menu style={{ background: 'rgba(250,250,250, 0)', float: 'right' }} onClick={onClick} items={menuItems} mode="horizontal"  selectedKeys={selected} className="menu">
-                  </Menu>
+              <Col >
+                  <Row>
+                    <Col>
+                      <Menu 
+                        style={{ background: 'rgba(250,250,250, 0)', float: 'right' }} 
+                        onClick={onClick} 
+                        items={menuItems} 
+                        mode="horizontal"  
+                        selectedKeys={selected} 
+                        className="menu"
+                      />
+                    </Col>
+                    <Col>
+                      {!user.id
+                        ? <Button type='primary'><Link to='/login'>Đăng nhập</Link></Button>
+                        : <>
+                          {user.name}
+                          <Dropdown overlay={menu} trigger={['click']}>
+                            <Avatar icon={<UserOutlined />} /> 
+                          </Dropdown>
+                      </>}
+                    </Col>
+                  </Row>
               </Col>
+             
           </Row>
           
           
