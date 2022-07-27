@@ -124,6 +124,9 @@ const Provider = ({ children }) => {
     getListCategory: () => {
       return axios.get('/api/category/getlist', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
+    getFilterCategory: () => {
+      return axios.get('/api/category/getfilter', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
     storeCategory: (values) => {
       return axios.post('/api/category/store', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
@@ -149,8 +152,95 @@ const Provider = ({ children }) => {
     },
     deletePerson: () => {
       return axios.get('/api/person/delete/{id}', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
-    }
+    },
 
+    // 
+    getListCountry: () => {
+      return axios.get('/api/country/getlist', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    
+    // Movies
+    getMovies: (keyID) => {
+      return axios.get(`/api/movies/getitem/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    getListMovies: () => {
+      return axios.get('/api/movies/getlist', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    storeMovies: (values) => {
+      return axios.post('/api/movies/store', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    updateMovies: (values) => {
+      return axios.post(`/api/movies/update`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    deleteMovies: () => {
+      return axios.get('/api/movies/delete/{id}', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    // Cinemal hall
+    getCinemalHall: (keyID) => {
+      return axios.get(`/api/cinema-hall/getitem/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    getListCinemalHall: () => {
+      return axios.get('/api/cinema-hall/getlist', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    storeCinemalHall: (values) => {
+      return axios.post('/api/cinema-hall/store', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    updateCinemalHall: (values) => {
+      return axios.post(`/api/cinema-hall/update`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    deleteCinemalHall: (keyID) => {
+      return axios.get(`/api/cinema-hall/delete/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    // show h
+    getShow: (keyID) => {
+      return axios.get(`/api/show/getitem/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    getTicket: (keyID) => {
+      return axios.get(`/api/show/getlist/ticket/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    getSeatMap: (values) => {
+      return axios.post(`/api/show/getseatmap`, values,  { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    getListShow: () => {
+      return axios.get('/api/show/getlist', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    storeShow: (values) => {
+      return axios.post('/api/show/store', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    updateShow: (values) => {
+      return axios.post(`/api/show/update`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    deleteShow: (keyID) => {
+      return axios.get(`/api/show/delete/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    //Cinema
+    getCinemaWithMovie: (keyID) => {
+      return axios.get(`/api/cinema/getitem-with-movie/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    getCinema: (keyID) => {
+      return axios.get(`/api/cinema/getitem/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    getListCinema: () => {
+      return axios.get('/api/cinema/getlist', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    storeCinema: (values) => {
+      return axios.post('/api/cinema/store', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    updateCinema: (values) => {
+      return axios.post(`/api/cinema/update`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    deleteCinema: (keyID) => {
+      return axios.get(`/api/cinema/delete/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+
+    // Client
+
+    getMoviesShow: () => {
+      return axios.get(`/api/getmovies-show`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
 
   }
 

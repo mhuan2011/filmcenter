@@ -17,6 +17,26 @@ class CategoriesController extends Controller
             'data' => $data,
         ]);
     }
+
+    public function getfilter()
+    {
+        $format = [];
+        $data = Categories::select('name', 'id')->get();
+        foreach ($data as $temp) {
+            $temp = [
+                'text' => $temp->name,
+                'value' => $temp->id
+            ];
+
+            array_push($format, $temp);
+        };
+
+        return response()->json([
+            'status' => true,
+            'data' => $format,
+        ]);
+    }
+
     public function getitem($id)
     {
         $item = Categories::find($id);

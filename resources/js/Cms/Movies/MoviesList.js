@@ -7,11 +7,22 @@ import { AppContext } from '../../Context';
 
 const MoviesList = () => {
   let navigate = useNavigate();
-  const {deleteMenu } = useContext(AppContext);
+  const { getFilterCategory, getListMovies } = useContext(AppContext);
   const [data, setData] = useState();
   const [loadingTable, setLoadingTable] = useState(true);
+  const [categories, setCategories] = useState([])
+
+
   useEffect(() => {
-    setLoadingTable(false)
+    getFilterCategory().then((res) => {
+      setCategories(res.data.data);
+      console.log(res.data.data)
+    });
+    getListMovies ().then((res) => {
+      setData(res.data.data);
+      setLoadingTable(false)
+    });
+    
   }, [])
   const columns = [
     {
@@ -22,60 +33,56 @@ const MoviesList = () => {
     },
     {
         title: 'Ảnh',
-        dataIndex: 'pic',
-        key: 'pic',
+        dataIndex: 'image',
+        key: 'image',
         width: 130,
-        render: pic => {
+        render: image => {
           return (
             <Image
-              width={40}
-              height={40}
-              preview={false}
-              src={APP_URL + '/images' + pic}
+              width={70}
+              src={APP_URL + '/images/movies' + image}
             />
           )
         }
       },
     {
       title: 'Tên phim',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'title',
+      key: 'title',
+      width: 300,
     },
     {
-        title: 'Danh mục',
-        key: 'category',
-        dataIndex: 'category',
+      title: 'Thời lượng (giờ)',
+      dataIndex: 'duration',
+      key: 'duration',
+      width: 150,
+    },
+    {
+      title: 'Ngày ra mắt',
+      dataIndex: 'release_date',
+      key: 'release_date',
+      width: 120,
+    },
+    {
+        title: 'Thể loại',
+        key: 'category_id',
+        dataIndex: 'category_id',
         width: 120,
-        filters: [
-          {
-            text: 'Món Khai Vị',
-            value: 1,
-          },
-          {
-            text: 'Món Chính',
-            value: 2,
-          },
-          {
-            text: 'Món Đặc Biệt',
-            value: 3,
-          },
-          {
-            text: 'Nước giải khát',
-            value: 4,
-          },
-        ],
-        onFilter: (value, record) => record.category == value,
-        render: (value, record) => {
-          if (record.category === 1) return <Tag color="purple">Món Khai Vị</Tag>
-          if (record.category === 2) return <Tag color="green">Món Chính</Tag>
-          if (record.category === 3) return <Tag color="yellow">Món Đặc Biệt</Tag>
-          if (record.category === 4) return <Tag color="pink">Nước giải khát</Tag>
+        filters: categories,
+        onFilter: (value, record) => record.category_id == value,
+        render: (_, record) => {
+          return <>{record.category.name}</>
         }
       },
     {
       title: 'Mô tả',
       dataIndex: 'description',
       key: 'description',
+      render: (description) => {
+        return (
+          <div dangerouslySetInnerHTML={{__html: description}}></div>
+        )
+      }
     },
     
     
@@ -95,7 +102,7 @@ const MoviesList = () => {
     },
   ];
   const update = (record) => {
-    navigate(`/admin/menus/detail/${record.id}`)
+    navigate(`/admin/movies/detail/${record.id}`)
   }
   const remove = (record) => {
     setLoadingTable(true)
@@ -113,7 +120,7 @@ const MoviesList = () => {
         <Breadcrumb.Item>Danh sách</Breadcrumb.Item>
       </Breadcrumb>
       <div className="site-layout-background" style={{ padding: 16, minHeight: 480 }}>
-        <Button type='primary' style={{ marginBottom: '16px' }}><Link to="/admin/menus/detail">Thêm phim</Link></Button>
+        <Button type='primary' style={{ marginBottom: '16px' }}><Link to="/admin/movies/detail?action=add">Thêm phim</Link></Button>
         <Table
           bordered
           scroll={{ x: 980 }}

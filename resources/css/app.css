@@ -3,6 +3,10 @@
 	float: right;
 }
 
+.seat-order {
+	background: #ff5db4;
+	color: #fff;
+}
 /* home */
 .slider-review {
 	position: relative;
@@ -331,4 +335,28 @@ background: url('https://www.kinomeister.de/wp-content/uploads/2020/08/sith4.jpg
 	margin: 15px 0;
 	box-shadow: 0 3px 10px rgba(255, 255, 255, 0.7);
 	text-align: center;
+}
+
+.seat-type {
+	width: 20px;
+	height: 20px;
+	margin-right: 10px;
+	border: 1px solid #888;
+}
+
+.booking {
+	border: none;
+	background: #ff4d4f;
+}
+
+.chossing {
+	border: none;
+	background: #2196f3;
+}
+
+.container-seat {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
 }

@@ -12,77 +12,97 @@ const { Search } = Input;
 const Ticket = () => {
   const [selected, setSelected] = useState('');
   const [selectTheater, setSelectTheater] = useState('');
+  const { getMoviesShow, getCinemaWithMovie  } = useContext(AppContext);
+  const [movies, setMovies] = useState([]);
+  const [cinema, setCinema  ] = useState([]);
 
-  const menuItems = [
-    {
-      key: 'film_1',
-      height: '100px',
-      label: 
-        <div>
-          <Row >
-              <Col span={8} >
-              <img style={{height: '100px'}} src='https://cdn.galaxycine.vn/media/2022/6/13/1350x900---copy_1655112805440.jpg'></img>
-              </Col>
-              <Col span={16} >
-                <h3 style={{margin: 0}}>THOR: LOVE AND THUNDER THOR </h3>
-                TÌNH YÊU VÀ SẤM SÉT  <Tag color="#f50">16+</Tag>
-              </Col>
-          </Row>
-        </div>
-      ,
-    },
-    {
-      key: 'film_2',
-      label: <div>
-          <Row >
-              <Col span={8} >
-              <img style={{height: '100px'}} src='https://cdn.galaxycine.vn/media/2022/6/14/1350wx900h_1655176461942.jpg'></img>
-              </Col>
-              <Col span={16} >
-                  <Row>
-                    <Col>
-                      
-                    </Col>
-                  </Row>
-              </Col>
-          </Row>
-      </div>,
-    },
+  const [loadingMovies, setLoadingMovies] = useState(false);
+  const [loadingCinema, setLoadingCinema] = useState(false);
+
+
+  useEffect(()=> {
+    setLoadingMovies(true);
+    getMoviesShow().then((res) => {
+      createListMovies(res.data.data);
+      setLoadingMovies(false)
+    });
+  },[])
+
+  const createListMovies = (listMovies) => {
+    var movies_menu = []
+    if(listMovies) {
+      listMovies.map((item, index) => {
+        var temp = {
+          key: item.id,
+          height: '100px',
+          label: 
+            <div>
+              <Row >
+                  <Col span={8} >
+                  <img style={{height: '100px'}} src={APP_URL + '/images/movies' + item.image}></img>
+                  </Col>
+                  <Col span={16} >
+                    <h3 style={{margin: 0}}> {item.title}</h3>
+                    Ngôn ngữ: {item.language} <Tag color="#f50">16+</Tag>
+                  </Col>
+              </Row>
+            </div>
+          ,
+        }
+        movies_menu.push(temp);
+      })
+      setMovies(movies_menu);
+    }
+  }
+
+  const creatListCinema = (listCinema) => {
+    var cinema_menu = []
+    if(listCinema) {
+      listCinema.map((item, index) => {
+        var temp = {
+          key: item.id,
+          height: '100px',
+          label: 
+            <div>
+              <Row style={{padding: 10}} justify="space-between">
+                <Col><p style={{margin: 0}}>{item.name}</p></Col>
+                <Col>
+                  <Button>Xem vị trí</Button>
+                </Col>
+              </Row>
+            </div>
+          ,
+        }
+        cinema_menu.push(temp);
+      })
+      setCinema(cinema_menu);
+    }
+  } 
+
   
-  ];
-
-  const theaterMenu = [
-    {
-      key: 'theater_1',
-      height: '100px',
-      label: 
-        <div>
-          <Row style={{padding: 10}} justify="space-between">
-            <Col><p style={{margin: 0}}>Filmcenter Phạm Văn Đồng </p></Col>
-            <Col>
-              <Button>Xem vị trí</Button>
-            </Col>
-
-          </Row>
-        </div>
-      ,
-    },
-    {
-      key: 'theater_2',
-      label: <div>
-          <Row style={{padding: 10}}>
-            <p style={{margin: 0}}>Filmcenter Nguyễn Trãi </p>
-          </Row>
-      </div>,
-    },
-  
-  ];
   
   const onClick = (e) => {
     setSelected(e.key);
+    setSelectTheater("");
+    if(e.key) {
+      setLoadingCinema(true);
+      getCinemaWithMovie(e.key).then((res) => {
+        creatListCinema(res.data.data);
+        setLoadingCinema(false);
+      });
+    }
   };
+
+
   const choosenTheater = (e) => {
       setSelectTheater(e.key);
+      if(e.key) {
+        // setLoadingCinema(true);
+        // getCinemaWithMovie(e.key).then((res) => {
+        //   creatListCinema(res.data.data);
+        //   setLoadingCinema(false);
+        // });
+      }
   }
   return (
     <div className="buying-ticket">
@@ -122,9 +142,10 @@ const Ticket = () => {
                                         padding: 10
                                       }}
                                     >
-                                      {/* <Search placeholder="Tìm phim"  style={{ width: '100%' }} /> */}
-                                      
-                                      <Menu onClick={onClick} items={menuItems} selectedKeys={selected} mode="inline" className='film-menu'/>
+                                      <Search placeholder="Tìm phim"  style={{ width: '100%' }} />
+                                      <Spin spinning={loadingMovies}>
+                                        <Menu onClick={onClick} items={movies} selectedKeys={selected} mode="inline" className='film-menu'/>
+                                      </Spin>
                                 </Card>
                               </Col>
                               <Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 0 }}>
@@ -132,11 +153,17 @@ const Ticket = () => {
                                       title="CHỌN RẠP"
                                       hoverable
                                       bodyStyle={{
-                                        padding: 10
+                                        padding: 10,
+                                        height: '100%'
                                       }}
                                     >
-                                      <Menu onClick={choosenTheater} items={theaterMenu} selectedKeys={selectTheater} mode="inline" className='theater-menu'/>
-                                      {/* <Meta  description="Vui lòng chọn rạp" /> */}
+                                      <Spin spinning={loadingCinema}>
+                                      {cinema.length == 0 ?
+                                        <Meta  description="Vui lòng chọn phim" /> :
+                                        <Menu onClick={choosenTheater} items={cinema} selectedKeys={selectTheater} mode="inline" className='theater-menu'/>
+                                      }
+                                      </Spin>
+                                      
                                 </Card>
                               </Col>
                               <Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 0 }}>

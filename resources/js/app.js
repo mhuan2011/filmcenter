@@ -20,6 +20,14 @@ import MoviesList from './Cms/Movies/MoviesList';
 import MoviesCategory from './Cms/Movies/MoviesCategory';
 import Person from './Cms/Movies/Person/Person';
 import ActPerson from './Cms/Movies/Person/ActPerson';
+import ActMovies from './Cms/Movies/ActMovies';
+import CinemaHall from './Cms/CinemaHall/CinemaHall';
+import ActCinemalHall from './Cms/CinemaHall/ActCinemalHall';
+import Show from './Cms/Show/Show';
+import ActShow from './Cms/Show/ActShow';
+import TicketList from './Cms/Show/TicketList';
+import Cinema from './Cms/Cinema/Cinema';
+import ActCinema from './Cms/Cinema/ActCinema';
 
 
 function App() {
@@ -43,10 +51,22 @@ function App() {
               <Route path='/admin' element={<PrivateOutlet />}>
                 <Route index element={<Dashboard />} />
                 <Route path='movies' element={<MoviesList />} />
+                <Route path='movies/detail' element={<ActMovies/>}/>
+                <Route path='movies/detail/:id' element={<ActMovies/>}/>
                 <Route path='category' element={<MoviesCategory />} />
                 <Route path='person' element={<Person />} />
                 <Route path='person/detail' element={<ActPerson/>}/>
                 <Route path='person/detail/:id' element={<ActPerson/>}/>
+                <Route path='cinema-hall' element={<CinemaHall/>}/>
+                <Route path='cinema-hall/detail' element={<ActCinemalHall/>}/>
+                <Route path='cinema-hall/detail/:id' element={<ActCinemalHall/>}/>
+                <Route path='show' element={<Show/>}/>
+                <Route path='show/detail' element={<ActShow/>}/>
+                <Route path='show/detail/:id' element={<ActShow/>}/>
+                <Route path='show/ticket' element={<TicketList/>}/>
+                <Route path='cinema' element={<Cinema/>}/>
+                <Route path='cinema/detail' element={<ActCinema/>}/>
+                <Route path='cinema/detail/:id' element={<ActCinema/>}/>
               </Route>
           </Routes>
         </div>

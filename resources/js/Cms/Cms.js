@@ -70,21 +70,36 @@ const Cms = () => {
               <Link to="/admin/movies">Danh sách phim</Link>
             </Menu.Item>
           </SubMenu> : null}
+
           <SubMenu
             key="sub1"
             icon={<ProfileOutlined />}
             title="Quản lý vé"
           >
             <Menu.Item key="sub1-1">
-              <Link to="/admin/orders_store">Danh sách vé</Link>
+              <Link to="/admin/show">Lịch chiếu</Link>
             </Menu.Item>
           </SubMenu>
+
+          {user.role_id === 1 ? <SubMenu
+            key="cinema-hall"
+            icon={<ProfileOutlined />}
+            title="Quản lý rạp"
+            
+          >
+            <Menu.Item key="menus-4">
+              <Link to="/admin/cinema-hall">Danh phòng chiếu</Link>
+            </Menu.Item>
+            <Menu.Item key="menus-5">
+              <Link to="/admin/cinema">Danh sách rạp</Link>
+            </Menu.Item>
+           
+          </SubMenu> : null}
+
           {user.role_id < 3 ? <Menu.Item key="7" icon={<UserOutlined />}>
             <Link to="/admin/users">Quản lý tài khoản</Link>
           </Menu.Item> : null}
-          {user.role_id === 1 ? <Menu.Item key="8" icon={<HomeOutlined />}>
-            <Link to="/admin/stores">Quản lý rạp</Link>
-          </Menu.Item> : null}
+          
         </Menu>
       </Sider>
       <Layout>
