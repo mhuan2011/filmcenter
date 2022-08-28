@@ -1,12 +1,20 @@
 import { Card, Carousel, Col, Row, Spin } from 'antd';
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AppContext } from '../../Context.js';
 import MovieItem from './MovieItem.js';
 
 
 const ListMovie = () => {
-
+    const { getMoviesShow } = useContext(AppContext);
+    const [data, setData] = useState([]);
+  
+    useEffect(() => {
+      getMoviesShow().then((res)=>{
+        setData(res.data.data);
+        
+      })
+    }, [])
   return (
     <div className="list-movies">
         <Row>
@@ -16,11 +24,10 @@ const ListMovie = () => {
                     <Spin tip="Loading..." spinning={false}>
                         <Card title="PHIM ĐANG CHIẾU" bordered={false}>
                             <Row gutter={[16, 16]}>
-                                <MovieItem bannerLink = "https://cdn.galaxycine.vn/media/2022/7/13/1350wx900h_1657696049421.jpg"/>
-                                <MovieItem bannerLink = "https://cdn.galaxycine.vn/media/2022/7/4/1350wx900h_1656923606085.jpg"/>
-                                <MovieItem bannerLink = "https://cdn.galaxycine.vn/media/2022/6/14/1350wx900h_1655176461942.jpg"/>
-                                <MovieItem bannerLink = "https://cdn.galaxycine.vn/media/2022/6/14/1350wx900h_1655176461942.jpg"/>
-                                <MovieItem bannerLink = "https://cdn.galaxycine.vn/media/2022/6/14/1350wx900h_1655176461942.jpg"/>
+                                 {data.map((item, index)=> (
+                                    <MovieItem key={index} item = {item}/>
+                                 ))}
+                                
                             </Row>
                         </Card>
                     </Spin>

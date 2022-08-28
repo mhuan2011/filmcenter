@@ -11,7 +11,7 @@ class CinemaHallController extends Controller
 {
     public function getlist()
     {
-        $data = CinemaHall::orderBy('id', 'DESC')->get();
+        $data = CinemaHall::orderBy('id', 'DESC')->with('cinema')->get();
         return response()->json([
             'status' => true,
             'data' => $data,

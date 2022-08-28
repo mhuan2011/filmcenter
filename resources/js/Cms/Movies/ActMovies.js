@@ -8,6 +8,7 @@ import { openNotification } from '../../Client/Helper/Notification';
 import { AppContext } from '../../Context'; 
 import 'react-quill/dist/quill.snow.css';
 import TextEditor from '../Helper/TextEditor';
+import Actor from './Actor';
 
 const initialValues = {
   category: 1,
@@ -21,7 +22,7 @@ const formItemLayout = {
 const { Search, TextArea } = Input;
 const dateFormat = 'YYYY/MM/DD';
 const ActMovies = () => {
-  const { getMovies, storeMovies, updateMovies,  getListCountry, getListCategory} = useContext(AppContext);
+  const { getMovies, storeMovies, updateMovies,  getListCountry, getListCategory, getActors} = useContext(AppContext);
 
   let navigate = useNavigate();
   const params = useParams();
@@ -31,6 +32,7 @@ const ActMovies = () => {
   const [pic, setPic] = useState();
   const [country, setCountry] = useState([]);
   const [categories, setCategories] = useState([]);
+ 
 
   const operations = <>
     <Button onClick={() => onSubmit()} type="primary" style={{ marginRight: 8 }} icon={<SaveOutlined />}>
@@ -52,17 +54,21 @@ const ActMovies = () => {
 
     useEffect(() => {
         if (params.id) {
-        setLoadingForm(true)
-        getMovies(params.id).then((res) => {
-            var dataForm = res.data.data;
-            dataForm.release_date = moment(dataForm.release_date);
-            form.setFieldsValue(res.data.data)
-            setPic(res.data.data.image)
-            setItem(res.data.data)
-            setLoadingForm(false)
-        })
+          setLoadingForm(true)
+          getMovies(params.id).then((res) => {
+              var dataForm = res.data.data;
+              dataForm.release_date = moment(dataForm.release_date);
+              form.setFieldsValue(res.data.data)
+              setPic(res.data.data.image)
+              setItem(res.data.data)
+              setLoadingForm(false)
+          })
+          
+          
         }
     }, []);
+
+    
 
     const onSubmit = () => {
         form.validateFields().then((values) => {
@@ -111,6 +117,9 @@ const ActMovies = () => {
         }, 0);
     };
 
+   
+    
+  
   return (
     <>
       <Breadcrumb style={{ margin: '16px 0' }}>
@@ -121,7 +130,7 @@ const ActMovies = () => {
         <Card
           size="small"
           title={
-            item.name ? <h3>{item.name}<br /><small>{item.username}</small></h3> : <h3>{'Thêm phim mới'}</h3>
+            item.title ? <h3>Phim: {item.title}<br /><small>ID: {item.id}</small></h3> : <h3>{'Thêm phim mới'}</h3>
           }
           style={{ width: '100%' }}
           extra={operations}
@@ -175,6 +184,7 @@ const ActMovies = () => {
                     <Select
                       optionFilterProp="children"
                       placeholder="Select country"
+                      showSearch
                     >
                         {country.map((record, index) => {
                             return (
@@ -200,6 +210,7 @@ const ActMovies = () => {
                     <Select
                       optionFilterProp="children"
                       placeholder="Select category"
+                      showSearch
                     >
                         {categories.map((record, index) => {
                             return (
@@ -244,6 +255,7 @@ const ActMovies = () => {
                 </Col>
               </Row>
             </Form>
+            {params.id ? <Actor keyID={params.id} /> : <></>}
           </Spin>
         </Card>
       </div>

@@ -7,8 +7,11 @@ use App\Http\Controllers\CinemaHallController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\MoviesController;
+use App\Http\Controllers\PaymenController;
 use App\Http\Controllers\PersonController;
+use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ShowController;
+use App\Http\Controllers\StarController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +34,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+Route::post('/user/update', [AuthController::class, 'update'])->middleware('auth:sanctum');
 
 //Categories
 Route::get('/category/getlist', [CategoriesController::class, 'getlist'])->middleware('auth:sanctum');
@@ -51,8 +55,8 @@ Route::get('/person/delete/{id}', [PersonController::class, 'delete'])->middlewa
 Route::get('/country/getlist', [CountryController::class, 'getlist'])->middleware('auth:sanctum');
 
 //Movies
-Route::get('/movies/getlist', [MoviesController::class, 'getlist'])->middleware('auth:sanctum');
-Route::get('/movies/getitem/{id}', [MoviesController::class, 'getitem'])->middleware('auth:sanctum');
+Route::get('/movies/getlist', [MoviesController::class, 'getlist']);
+Route::get('/movies/getitem/{id}', [MoviesController::class, 'getitem']);
 Route::post('/movies/store', [MoviesController::class, 'store'])->middleware('auth:sanctum');
 Route::post('/movies/update', [MoviesController::class, 'update'])->middleware('auth:sanctum');
 Route::get('/movies/delete/{id}', [MoviesController::class, 'delete'])->middleware('auth:sanctum');
@@ -66,7 +70,7 @@ Route::post('/cinema-hall/update', [CinemaHallController::class, 'update'])->mid
 Route::get('/cinema-hall/delete/{id}', [CinemaHallController::class, 'delete'])->middleware('auth:sanctum');
 
 //Cinema
-Route::get('/cinema/getitem-with-movie/{id}', [CinemaController::class, 'getCinemaWithMovie'])->middleware('auth:sanctum');
+
 Route::get('/cinema/getlist', [CinemaController::class, 'getlist'])->middleware('auth:sanctum');
 Route::get('/cinema/getitem/{id}', [CinemaController::class, 'getitem'])->middleware('auth:sanctum');
 Route::post('/cinema/store', [CinemaController::class, 'store'])->middleware('auth:sanctum');
@@ -84,4 +88,27 @@ Route::post('/show/update', [ShowController::class, 'update'])->middleware('auth
 Route::get('/show/delete/{id}', [ShowController::class, 'delete'])->middleware('auth:sanctum');
 
 //Client
-Route::get('/getmovies-show', [ClientController::class, 'getMovieShow'])->middleware('auth:sanctum');
+Route::get('/getmovies-show', [ClientController::class, 'getMovieShow']);
+Route::get('/getinfor-show/{id}', [ClientController::class, 'getInforShow']);
+Route::get('/get-show-date', [ClientController::class, 'getShowDate']);
+Route::post('/getmovies-cinema-date', [ClientController::class, 'getMoviesWithCinemAndDate']);
+
+
+Route::get('/cinema/getitem-with-movie/{id}', [CinemaController::class, 'getCinemaWithMovie'])->middleware('auth:sanctum');
+Route::post('/getshow', [ClientController::class, 'getShowWithMovieCinema'])->middleware('auth:sanctum');
+
+
+// payment
+Route::post('/momo-payment', [PaymenController::class, 'paymentWithMomo']);
+Route::post('/vnpay-payment', [PaymenController::class, 'paymentWithVNpay']);
+Route::post('/payment/result', [PaymenController::class, 'result']);
+
+//reservation
+Route::post('/reservation', [ReservationController::class, 'reservation']);
+
+//star
+Route::post('/update-star', [StarController::class, 'updateStar']);
+Route::post('/get-actors', [StarController::class, 'getActors']);
+
+//Dashboard
+Route::post('/statistic-by-date', [ClientController::class, 'statistic'])->middleware('auth:sanctum');

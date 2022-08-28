@@ -7,6 +7,7 @@ import helper from '../../Helper/helper.js';
 const SelectTicket = ({ticketInfor, setTicketInfor, setTotal}) => {
   const [dataSource, setDataSource] = useState([]);
   
+  
   useEffect(() => {
     setDataSource(data);
   },[])
@@ -43,7 +44,7 @@ const SelectTicket = ({ticketInfor, setTicketInfor, setTotal}) => {
     });
     setTotal(totalPrice);
     // 
-    ticketInfor.ticketType = ticketInfor;
+    ticketInfor.ticketType = ticketType;
     setTicketInfor(ticketInfor);
   }
 

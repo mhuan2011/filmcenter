@@ -1,17 +1,18 @@
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Image, Popconfirm, Space, Table, Tag } from 'antd';
+import { Breadcrumb, Button, Image, Popconfirm, Space, Table, Typography  } from 'antd';
+import moment from 'moment';
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { openNotification } from '../../Client/Helper/Notification'; 
 import { AppContext } from '../../Context'; 
-
+const { Paragraph, Text } = Typography;
 const MoviesList = () => {
   let navigate = useNavigate();
   const { getFilterCategory, getListMovies } = useContext(AppContext);
   const [data, setData] = useState();
   const [loadingTable, setLoadingTable] = useState(true);
   const [categories, setCategories] = useState([])
-
+  const [ellipsis, setEllipsis] = useState(true);
 
   useEffect(() => {
     getFilterCategory().then((res) => {
@@ -39,7 +40,7 @@ const MoviesList = () => {
         render: image => {
           return (
             <Image
-              width={70}
+              width={'100%'}
               src={APP_URL + '/images/movies' + image}
             />
           )
@@ -52,16 +53,24 @@ const MoviesList = () => {
       width: 300,
     },
     {
-      title: 'Thời lượng (giờ)',
+      title: 'Thời lượng (phút)',
       dataIndex: 'duration',
       key: 'duration',
       width: 150,
+      render: (duration) => (
+        <>{duration * 60}</>
+      )
     },
     {
       title: 'Ngày ra mắt',
       dataIndex: 'release_date',
       key: 'release_date',
       width: 120,
+      render: (time) => (
+        <>
+          {moment(time).format('DD/MM/YYYY')}
+        </>
+      )
     },
     {
         title: 'Thể loại',
@@ -74,16 +83,28 @@ const MoviesList = () => {
           return <>{record.category.name}</>
         }
       },
-    {
-      title: 'Mô tả',
-      dataIndex: 'description',
-      key: 'description',
-      render: (description) => {
-        return (
-          <div dangerouslySetInnerHTML={{__html: description}}></div>
-        )
-      }
-    },
+      {
+        title: 'Mô tả',
+        dataIndex: 'description',
+        key: 'description',
+        render: (description) => {
+          return (
+            <Paragraph
+            ellipsis={
+              ellipsis
+                ? {
+                    rows: 2,
+                    expandable: true,
+                    symbol: 'more',
+                  }
+                : false
+            }
+          >
+            {description}
+          </Paragraph>
+          )
+        }
+      },
     
     
     {

@@ -1,4 +1,4 @@
-import { Affix, Button, Card, Carousel, Col, Divider, Row, Steps } from 'antd';
+import { Affix, Button, Card, message, Col, Divider, Row, Steps } from 'antd';
 import Meta from 'antd/lib/card/Meta.js';
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -13,37 +13,93 @@ import SelectTicket from './Step/SelectTicket.js';
 
 const { Step } = Steps;
 
-
+const initialTicketInfor = {
+  ticketType: [],
+  reserveSeat: []
+}
 const BookTicket = () => {
-  const [ticketInfor, setTicketInfor] = useState({});
+  const { getInforShow, getMovies } = useContext(AppContext);
+  const [ticketInfor, setTicketInfor] = useState({initialTicketInfor});
   const [total, setTotal] = useState(0);
+  const [seat, setSeat] = useState(0);
+  const [data, setData] = useState([]);
+  const [movie, setMovie] = useState([]);
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const showId = queryParams.get('showId');
+    getInforShow(showId).then(function (res) {
+      setData(res.data.data);
+      });
+    setTicketInfor(initialTicketInfor);
+  }, []);
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const movieId = queryParams.get('movieId');
+    if(movieId) {
+      getMovies(movieId).then(function (res) {
+        console.log("movieID", movieId);    
+        setMovie(res.data.data);
+      });
+    }
+  }, []);
 
   const steps = [
     {
       title: 'Chọn vé',
       content:  <>
           <SelectTicket ticketInfor={ticketInfor} setTicketInfor={setTicketInfor} setTotal = {setTotal}/>
-          <Combo ticketInfor={ticketInfor} setTicketInfor={setTicketInfor} setTotal = {setTotal}/>
+          {/* <Combo ticketInfor={ticketInfor} setTicketInfor={setTicketInfor} setTotal = {setTotal}/> */}
       </>,
     },
     {
       title: 'Chọn ghế',
-      content: <SeatMap/>,
+      content: <SeatMap ticketInfor={ticketInfor} setTicketInfor={setTicketInfor} total= {total} setSeat={setSeat}/>,
     },
     {
       title: 'Xác nhận',
-      content: <OrderForm/>,
+      content: <OrderForm ticketInfor={ticketInfor} setTicketInfor={setTicketInfor} total= {total} setSeat={setSeat}/>,
     },
-    {
-      title: 'Đặt vé thành công',
-      content: <ResultOrder/>,
-    },
+    // {
+    //   title: 'Đặt vé thành công',
+    //   content: <ResultOrder/>,
+    // },
   ];
   const [current, setCurrent] = useState(0);
 
   const next = () => {
-    setCurrent(current + 1);
+    if(current == 0) {
+      if(!ticketInfor.ticketType ) {
+        helper.openNotification("Thông báo", "Vui lòng chọn số lượng vé");
+      }else {
+        if(ticketInfor.ticketType.length == 0) {
+          helper.openNotification("Thông báo", "Vui lòng chọn số lượng vé");
+        }else
+        setCurrent(current + 1);
+      }
+      
+    }else if(current == 1) {
+      //get total seat
+      let totalSeat = 0;
+      ticketInfor.ticketType.forEach(element => {
+        totalSeat +=element.quantity;
+      });
+      if(seat.length < totalSeat) {
+        // helper.openNotification("Thông báo", `Vui lòng chọn đủ ${totalSeat} ghế!`);
+
+        message.warning(`Vui lòng chọn đủ ${totalSeat} ghế!`);
+      }else {
+        setCurrent(current + 1);
+      }
+    }
+    else {
+      setCurrent(current + 1);
+    }
+   
   };
+
+
 
   const prev = () => {
     setCurrent(current - 1);
@@ -100,23 +156,23 @@ const BookTicket = () => {
                       cover={
                         <img
                           alt="example"
-                          src="https://cdn.galaxycine.vn/media/2022/6/13/1350x900---copy_1655112805440.jpg"
+                          src={APP_URL + '/images/movies' + movie.image}
                         />
                       }
                     >
                       <Meta
-                          title="THOR: LOVE AND THUNDER"
-                          description="THOR: LOVE AND THUNDER"
+                          title={movie.title}
+                          // description="THOR: LOVE AND THUNDER"
                       />
                       <div className="detail-ticket">
                         <Divider orientation="left" orientationMargin="0"></Divider>
-                        Rạp: 
+                        Rạp: { data.cinema_hall ? data.cinema_hall.name : <></>}
                         <Divider orientation="left" orientationMargin="0"></Divider>
-                        Suất chiếu:
+                        Suất chiếu: {data.date +" ("+data.start_time +")"}
                         <Divider orientation="left" orientationMargin="0"></Divider>
                         Combo:
                         <Divider orientation="left" orientationMargin="0"></Divider>
-                        Ghế:
+                        Ghế: {seat ? seat.map(item => (item.rowChart+item.seat.number+", ")) : <></>}
                         <Divider orientation="left" orientationMargin="0"></Divider>
                         Tổng: {helper.formatCurrency(total)}
                       </div>

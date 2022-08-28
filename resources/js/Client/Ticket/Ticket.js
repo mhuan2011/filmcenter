@@ -1,24 +1,36 @@
 import { ScheduleOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import { Button, Card, Carousel, Col, Collapse, Input, List, Menu, Row, Select, Spin, Tabs, Tag } from 'antd';
 import Meta from 'antd/lib/card/Meta.js';
+import { stubString } from 'lodash';
+import moment from 'moment';
 import React, { useContext, useEffect, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AppContext } from '../../Context.js';
+import helper from '../Helper/helper.js';
+
 const { TabPane } = Tabs;
 const {Option} = Select;
 const { Panel } = Collapse;
 const { Search } = Input;
 
+
+const bookingInfor = {
+  movie_id: null,
+  ticket_id: null,
+  show_id: null
+}
+
 const Ticket = () => {
   const [selected, setSelected] = useState('');
   const [selectTheater, setSelectTheater] = useState('');
-  const { getMoviesShow, getCinemaWithMovie  } = useContext(AppContext);
+  const { getMoviesShow, getCinemaWithMovie, getShowWithCinemaMovies  } = useContext(AppContext);
   const [movies, setMovies] = useState([]);
   const [cinema, setCinema  ] = useState([]);
+  const [show, setShow  ] = useState([]);
 
   const [loadingMovies, setLoadingMovies] = useState(false);
   const [loadingCinema, setLoadingCinema] = useState(false);
-
+  const [loadingShow, setLoadingShow] = useState(false);
 
   useEffect(()=> {
     setLoadingMovies(true);
@@ -80,10 +92,10 @@ const Ticket = () => {
   } 
 
   
-  
   const onClick = (e) => {
     setSelected(e.key);
     setSelectTheater("");
+    setShow([]);
     if(e.key) {
       setLoadingCinema(true);
       getCinemaWithMovie(e.key).then((res) => {
@@ -97,13 +109,17 @@ const Ticket = () => {
   const choosenTheater = (e) => {
       setSelectTheater(e.key);
       if(e.key) {
-        // setLoadingCinema(true);
-        // getCinemaWithMovie(e.key).then((res) => {
-        //   creatListCinema(res.data.data);
-        //   setLoadingCinema(false);
-        // });
+        setLoadingShow(true);
+        var formData = new FormData()
+        formData.append("cinema_id", e.key);
+        formData.append("movie_id", selected);
+        getShowWithCinemaMovies(formData).then((res) => {
+          setShow(res.data.data);
+          setLoadingShow(false);
+        });
       }
   }
+
   return (
     <div className="buying-ticket">
         
@@ -174,30 +190,27 @@ const Ticket = () => {
                                         padding: 10
                                       }}
                                     >
-                                      <Collapse defaultActiveKey={['1']} >
-                                        <Panel header="Thu 7 (7.17.2022)" key="1">
-                                          <Row>
-                                            <Col span={8}>
-                                              2D - Phụ đề
-                                            </Col>
-                                            <Col span={16}>
-                                              <Row gutter={[16, 16]}>
-                                                <Col><Button>12:30</Button></Col>
-                                                <Col><Button>12:30</Button></Col>
-                                                <Col><Button>12:30</Button></Col>
-                                                <Col><Button>12:30</Button></Col>
-                                              </Row>
-                                            </Col>
-                                          </Row>
-                                        </Panel>
-                                        <Panel header="This is panel header 2" key="2">
-                                          <p>Chu Nhat (7.18.2022)</p>
-                                        </Panel>
-                                        <Panel header="This is panel header 3" key="3">
-                                          <p>Thu 2 (7.19.2022)</p>
-                                        </Panel>
-                                      </Collapse>
-                                      {/* <Meta  description="Vui lòng chọn suất chiếu" /> */}
+                                      <Spin spinning={loadingShow}>
+                                      {show.length == 0 ? <Meta  description="Vui lòng chọn suất chiếu" /> :  <Collapse  >{
+                                        show.map((item, index) => (
+                                          <Panel header={helper.formatDateToShow(item.date)} key={index}>
+                                            <Row>
+                                              <Col span={8}>
+                                                2D - Phụ đề
+                                              </Col>
+                                              <Col span={16}>
+                                                <Row gutter={[16, 16]}>
+                                                  {item.show.map((detail) => (
+                                                    <Col key={detail.id}><Link to={`/book-ticket?movieId=${selected}&cinemaId=${selectTheater}&showId=${detail.id}` } ><Button>{ moment(detail.start_time, "HH:mm:ss").format("hh:mm")}</Button></Link></Col>
+                                                  ))
+                                                  }
+                                                </Row>
+                                              </Col>
+                                            </Row>
+                                          </Panel>
+                                        ))
+                                      }</Collapse>} 
+                                      </Spin>
                                 </Card>
                               </Col>
                             </Row>

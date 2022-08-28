@@ -10,4 +10,9 @@ class CinemaHall extends Model
     use HasFactory;
     protected $table = 'cinema_hall';
     protected $guarded = [];
+
+    public function cinema()
+    {
+        return $this->belongsTo(Cinema::class);
+    }
 }

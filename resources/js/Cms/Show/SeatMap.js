@@ -1,4 +1,4 @@
-import { Affix, Avatar, Button, Card, Col, Divider, InputNumber, Row, Space, Spin, Table, Tag } from 'antd'
+import { Affix, Avatar, Button, Card, Col, Divider, InputNumber, Row, Popover , Spin, Table, Tag } from 'antd'
 import Meta from 'antd/lib/card/Meta.js';
 import React, { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../../Context.js'; 
@@ -32,7 +32,7 @@ const SeatMap = ({showId}) => {
     }
    
   }, [showId])
-  
+
   const renderSeat = () => {
     var seatMaps = data.map((ele) =>
       <Row gutter={2} justify="center" wrap={false} key={ele.row} >
@@ -41,7 +41,7 @@ const SeatMap = ({showId}) => {
             <Col key={item.seat_id}  style={{padding: '5px'}}>
              {
               item.status == 0?  <Button className='seat' >{item.number}</Button> :
-              <Button className='seat' type="primary" danger>{item.number}</Button>
+                <Button className='seat' type="primary" danger>{item.number}</Button>
              }
             </Col>))
           }

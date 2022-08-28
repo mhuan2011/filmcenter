@@ -241,7 +241,74 @@ const Provider = ({ children }) => {
     getMoviesShow: () => {
       return axios.get(`/api/getmovies-show`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
+    getInforShow: (keyID) => {
+      return axios.get(`/api/getinfor-show/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    getShowDate: () => {
+      return axios.get(`/api/get-show-date`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
 
+    getMoviesWithCinemaAndDate: (values) => {
+      return axios.post(`/api/getmovies-cinema-date`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+
+
+    getShowWithCinemaMovies: (values) => {
+      return axios.post(`/api/getshow`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    //payment
+    getPaymentMomo: (values) => {
+      return axios.post(`/api/momo-payment`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    getPaymentVnPay: (values) => {
+      return axios.post(`/api/vnpay-payment`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    getResultPayment: (values) => {
+      return axios.post(`/api/payment/result`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    //reservation
+    reservation: (values) => {
+      return axios.post(`/api/reservation`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    //star
+    updateStar: (values) => {
+      return axios.post(`/api/update-star`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    getActors: (values) => {
+      return axios.post(`/api/get-actors`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    // user
+    updateUserInfor: (values) => {
+      return axios.post(`/api/user/update`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    //dashboard
+    statisticByDate: (values) => {
+      return axios.post('/api/statistic-by-date', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    getParams: () => {
+      var url = window.location.href;
+        var params = url.split(['?'])[1];
+        var values = [];
+        if(params) {
+          params = params.split('&');
+          params.forEach(element => {
+            element = element.split('=');
+            values.push({
+              key:element[0],
+              value: element[1] 
+            })
+          });
+        }
+        return values;
+    }
   }
 
   

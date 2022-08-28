@@ -8,4 +8,4 @@ const openNotification = obj => {
   });
 };
 
-export {openNotification}
+export {openNotification} 

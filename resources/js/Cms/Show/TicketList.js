@@ -59,6 +59,15 @@ const TicketList = () => {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
+      render: (status) => {
+        let color = status == 0 ? 'geekblue' : 'green';
+        let text = status == 1 ? 'Được đặt' : 'Có sẵn';
+        return (
+          <Tag color={color}>
+            {text.toUpperCase()}
+          </Tag>
+        );
+      }
     },
     {
       title: 'Khách hàng',

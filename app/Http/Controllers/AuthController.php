@@ -77,4 +77,22 @@ class AuthController extends Controller
             ]
         ]);
     }
+
+    public function update(Request $request)
+    {
+
+        $data = $request->all();
+        $user = User::where('id', $data['id']);
+        // if($request->input('password')){
+        //     $request['password'] = Hash::make($request->input('password'));
+        // }
+        $user->update($request->all());
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'user' => $user,
+            ],
+            'message' => 'Update info successfully! Please login again!',
+        ]);
+    }
 }

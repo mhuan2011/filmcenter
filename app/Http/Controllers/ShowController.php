@@ -42,7 +42,11 @@ class ShowController extends Controller
 
             $show_seat = ShowSeat::where('show_id', $show_id)->get();
             foreach ($row as $r) {
-                $temp = Seat::where('row', $r->row)->selectRaw('show_seat.seat_id, seat.number, show_seat.status, show_seat.show_id')->rightJoin('show_seat', 'show_seat.seat_id', '=', 'seat.id')->where('show_seat.show_id', $show_id)->get();
+                $temp = Seat::where('row', $r->row)
+                    ->selectRaw('show_seat.id, show_seat.seat_id, seat.number, show_seat.status, show_seat.show_id')
+                    ->rightJoin('show_seat', 'show_seat.seat_id', '=', 'seat.id')
+                    ->where('show_seat.show_id', $show_id)
+                    ->get();
                 array_push($data, [
                     'row' => $r->row,
                     'seat' => $temp

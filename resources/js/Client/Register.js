@@ -14,10 +14,10 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
 
   const onFinish = (values) => {
-    // if(values.password !== values.repassword){
-    //   openNotification({status: false, message: 'Mật khẩu không khớp!' })
-    //   return;
-    // }
+    if(values.password !== values.repassword){
+      openNotification({status: false, message: 'Mật khẩu không khớp!' })
+      return;
+    }
     setLoading(true)
     axios.post('/api/register', values)
       .then((response) => {
@@ -63,13 +63,13 @@ const Register = () => {
               >
                 <Input.Password />
               </Form.Item>
-              {/* <Form.Item
+              <Form.Item
                 label="Nhập lại mật khẩu"
                 name="repassword"
                 rules={[{ required: true, message: 'Please input your password again!' }]}
               >
                 <Input.Password/>
-              </Form.Item> */}
+              </Form.Item>
               <Form.Item
                 label="Số điện thoại"
                 name="phone"
@@ -77,13 +77,13 @@ const Register = () => {
               >
                 <Input />
               </Form.Item>
-              {/* <Form.Item
+              <Form.Item
                 label="Email"
                 name="email"
                 rules={[{ required: true, message: 'Please input your email!' }]}
               >
                 <Input type="email" />
-              </Form.Item> */}
+              </Form.Item>
               <Form.Item>
                 <Button type="primary" htmlType="submit" className="login-form-button">
                   Đăng ký

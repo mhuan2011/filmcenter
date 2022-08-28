@@ -1,12 +1,86 @@
 import { Button, Card, Carousel, Col, DatePicker, Form, Row, Select, Tabs } from 'antd';
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AndroidOutlined, AppleOutlined, HomeOutlined, ScheduleOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import { AppContext } from '../../../Context.js';
+import { openNotification } from '../../Helper/Notification.js';
+import helper from '../../Helper/helper.js';
+import moment from 'moment';
 const { TabPane } = Tabs;
 
 const {Option} = Select;
 const ByFilm = () => {
+  let navigate = useNavigate();
+  const { getMoviesShow, getCinemaWithMovie , getShowWithCinemaMovies } = useContext(AppContext);
+
+  const [movies, setMovies] = useState([]);
+  const [cinema, setCinema] = useState([]);
+  const [show, setShow] = useState([]);
+  const [timeList, setTimeList] = useState([]);
+
+  const [movieID, setMovieID] = useState(null);
+  const [cinemaID, setCinemaID] = useState(null);
+  const [showID, setShowID] = useState(null);
+  const [date, setDate] = useState(null);
+
+  useEffect(() => {
+    getMoviesShow().then((res)=>{
+      setMovies(res.data.data);
+      
+    })
+  },[]);
+
+  const getCinema = ( id) => {
+    getCinemaWithMovie(id).then((res) => {
+      setMovieID(id);
+      setCinema([]); setShow([]); setTimeList([]);
+      setCinema(res.data.data);
+    });
+  }
+
+  const getShowDate = ( id) => {
+      setCinemaID(id);
+      if(id) {
+        var formData = new FormData()
+        formData.append("cinema_id", id);
+        formData.append("movie_id", movieID);
+        getShowWithCinemaMovies(formData).then((res) => {
+          setShow(res.data.data);
+        });
+      }
+  }
+
+  const getTime = ( id) => {
+    setDate(show[id].date);
+    setTimeList(show[id].show);
+  }
+
+  const selectShow = ( id) => {
+    setShowID(id);
+  }
+
+  const buyTicket = () => {
+    if(!movieID) {
+      helper.notification({status: "warning", message: "Vui lòng chọn phim!!!"})
+    }else {
+      if(!cinemaID) {
+        helper.notification({status: "warning", message: "Vui lòng chọn rạp!!!"})
+      }
+      else {
+        if(!date) {
+          helper.notification({status: "warning", message: "Vui lòng ngày!!!"})
+        }else {
+          if(!showID) {
+            helper.notification({status: "warning", message: "Vui lòng suất chiếu!!!"})
+          }else {
+            navigate(`/book-ticket?movieId=${movieID}&cinemaId=${cinemaID}&showId=${showID}`);
+          }
+        }
+      }
+    }
+
+     
+  }
 
   return (
     <Form
@@ -35,11 +109,13 @@ const ByFilm = () => {
           showSearch
           placeholder="Chọn phim"
           optionFilterProp="children"
+          onChange={getCinema}
           style={{ width: "100%", marginRight: 0 }}
         >
-          <Option value="jack">Cảnh Sát Vũ Trụ - Lightyear (2022)</Option>
-          <Option value="lucy">Điện Thoại Đen - The Black Phone (2022)</Option>
-          <Option value="tom">Phù Thủy Tối Thượng Trong Đa Vũ Trụ Hỗn Loạn - Doctor Strange in the Multiverse of Madness (2022)</Option>
+          
+          {movies.map((item, index)=> (
+            <Option value={item.id} key={index}>{item.title}</Option>
+          ))}
         </Select>
       </Form.Item>
 
@@ -56,9 +132,12 @@ const ByFilm = () => {
           showSearch
           placeholder="Chọn rạp"
           optionFilterProp="children"
+          onChange={getShowDate}
           style={{ width: "100%", marginRight: 0 }}
         >
-          <Option value="jack">GigaMall HCM</Option>
+          {cinema.map((item, index)=> (
+            <Option value={item.id} key={index}>{item.name}</Option>
+          ))}
         </Select>
       </Form.Item>
 
@@ -75,10 +154,13 @@ const ByFilm = () => {
         <Select
           showSearch
           placeholder="Chọn ngày"
+          onChange={getTime}
           optionFilterProp="children"
           style={{ width: "100%", marginRight: 0 }}
         >
-          <Option value="jack">Thứ 2 (18/7/2022)</Option>
+          {show.map((item, index)=> (
+            <Option value={index} key={index}>{item.date}</Option>
+          ))}
         </Select>
       </Form.Item>
       <Form.Item
@@ -94,9 +176,12 @@ const ByFilm = () => {
           showSearch
           placeholder="Chọn suất"
           optionFilterProp="children"
+          onChange={selectShow}
           style={{ width: "100%", marginRight: 0 }}
         >
-          <Option value="jack">12:30h (Phụ đề)</Option>
+          {timeList.map((item, index)=> (
+            <Option value={item.id} key={index}>{ moment(item.start_time, "HH:mm:ss").format("hh:mm")}</Option>
+          ))}
         </Select>
       </Form.Item>
       <Form.Item >
@@ -107,7 +192,7 @@ const ByFilm = () => {
               textAlign: 'right',
             }}
           >
-            <Button type="primary">Mua vé</Button>
+            <Button type="primary" onClick={() => buyTicket()}>Mua vé</Button>
           </Col>
         </Row>
         

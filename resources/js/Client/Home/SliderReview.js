@@ -11,13 +11,13 @@ const SliderReview = () => {
     <div className="slider-review">
       <Carousel autoplay>
         <div>
-          <SliderItem itemLink = "http://filmcenter.vn/images/banner_1.jpg"/>
+          <SliderItem itemLink = {APP_URL + '/images/banner_1.jpg'} />
         </div>
         <div>
-          <SliderItem itemLink = "http://filmcenter.vn/images/banner_2.jpg"/>
+          <SliderItem itemLink = {APP_URL + '/images/banner_2.jpg'}/>
         </div>
         <div>
-          <SliderItem itemLink = "http://filmcenter.vn/images/banner_3.jpg"/>
+          <SliderItem itemLink = {APP_URL + '/images/banner_3.jpg'}/>
         </div>
     
         </Carousel>

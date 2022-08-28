@@ -20,7 +20,7 @@ class MoviesController extends Controller
     }
     public function getitem($id)
     {
-        $item = Movies::where("id", $id)->first();
+        $item = Movies::where("id", $id)->with('category')->first();
         if (is_null($item)) {
             return response()->json([
                 'status' => false,

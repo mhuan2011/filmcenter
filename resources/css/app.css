@@ -34,44 +34,6 @@
     height: 400px;
 }
 /*  */
-.navbar {
-    padding: 0;
-    float: right; 
-}
-
-.nav-link {
-    padding: 4px 0;
-    font-family: "Poppins", sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    /* margin-right: 30px; */
-    color: #fff;
-    position: relative; 
-}
-.nav-link:before {
-    position: absolute;
-    content: '';
-    width: 0px;
-    height: 0px;
-    left: 50%;
-    top: 50%;
-    -webkit-transform: rotate(0deg);
-    -ms-transform: rotate(0deg);
-    transform: rotate(0deg);
-    margin-top: -2px;
-    border-radius: 50%;
-    margin-left: -25px;
-    opacity: 0;
-    -webkit-transition: all 0.3s ease-in;
-    -moz-transition: all 0.3s ease-in;
-    -o-transition: all 0.3s ease-in;
-    transition: all 0.3s ease-in;
-    background-image: -webkit-linear-gradient(0deg, #ff6975 0%, #d34d94 56%, #a730b2 100%); 
-}
-
-.menu {
-    width: 400px;
-}
 
 /*  */
 
@@ -229,9 +191,24 @@
         width: 300px;
         height: 200px;
     }
-    .menu {
+    /* .menu {
         width: 200px;
-    }
+    } */
+
+	.box-buy-ticket {
+		right: 0;
+    	top: 20%;
+		width: calc(100% - 20px);
+		margin: 10px;
+	}
+
+	.logo img {
+		width: 50%;
+	}
+	.ant-layout-header {
+		padding: 0 8px;
+		width: 50px;
+	}
 }
 
 
@@ -272,7 +249,7 @@ margin-top: 24px;
 }
 
 .ant-layout-content {
-	
+	background-image: url("https://phunugioi.com/wp-content/uploads/2020/02/mau-background-dep.jpg");
 	background-size: cover;
 
 }
@@ -359,4 +336,60 @@ background: url('https://www.kinomeister.de/wp-content/uploads/2020/08/sith4.jpg
 	flex-direction: row;
 	justify-content: center;
 	align-items: center;
+}
+
+.header-container {
+	display: flex;
+	justify-content: space-between;
+}
+
+.nav-bar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.menu {
+	min-width: 400px;
+}
+
+
+@media only screen and (max-width: 400px) {
+    .menu {
+		min-width: 30px;
+	}
+
+	.logo img {
+		width: 80%;
+		margin-left: 10px;
+	}
+}
+
+.text-logo {
+	font-size: 26px;
+	font-weight: bold;
+}
+
+.ant-card-cover img {
+	height: 300px;
+}
+
+.movies-list .ant-card-cover img {
+	height: 240px;
+}
+
+.progress-ticking .ant-card-cover img {
+	height: 200px;
+}
+
+.movie-infor {
+	list-style: none;
+	padding-left: 0px;
+}
+
+.movie-infor li {
+	padding-bottom: 10px;
+}
+.movie-infor span {
+	font-weight: bold;
 }

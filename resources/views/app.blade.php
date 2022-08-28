@@ -16,7 +16,7 @@
 
 <body>
     <div id="app"></div>
-    <script src="{{asset('js/index.js')}}?v=3.0"></script>
+    <script src="{{asset('js/index.js')}}"></script>
 </body>
 
 </html>

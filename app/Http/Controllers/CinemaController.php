@@ -13,10 +13,11 @@ class CinemaController extends Controller
     //
     public function getCinemaWithMovie($id)
     {
-        $data = Cinema::selectRaw('cinema.name, cinema_hall.id')
+        $data = Cinema::selectRaw('cinema.name, cinema.id')
             ->join('cinema_hall', 'cinema_hall.cinema_id', '=', 'cinema.id')
             ->join('show', 'show.cinema_hall_id', '=', 'cinema_hall.id')
             ->where('show.movie_id', $id)
+            ->groupBy('cinema.id', 'cinema.name')
             ->get();
 
         return response()->json([
@@ -25,31 +26,7 @@ class CinemaController extends Controller
         ]);
     }
 
-    public function getShowWithMovieCinema(Request $request)
-    {
-        $cinema_id = $request->cinema_id;
-        $movie_id = $request->movie_id;
-        $data = [];
-        $cinema_hall = CinemaHall::selectRaw('cinema_hall.id')
-            ->join('cinema', 'cinema.id', '=', 'cinema_hall.cinema_id')->where('cinema.id', $cinema_id)->get();
 
-        $date_show = Show::where('movie_id', $movie_id)->whereIn('cinema_hall_id', $cinema_hall)->get();
-
-        foreach ($date_show as $d) {
-            $temp = Show::where(['movie_id', $movie_id])->where(['date', $d->date])->whereIn('cinema_hall_id', $cinema_hall)->get();
-
-            array_push($data, [
-                'date' => $d->date,
-                'seat' => $temp
-            ]);
-        };
-
-
-        return response()->json([
-            'status' => true,
-            'data' => $data,
-        ]);
-    }
 
     public function getlist()
     {

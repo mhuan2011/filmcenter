@@ -18,7 +18,7 @@ class CreateTableShowSeatTable extends Migration
             $table->float('price');
             $table->integer('seat_id');
             $table->boolean('status');
-            $table->integer('reservation_id')->nullable();
+            $table->string('reservation_id')->nullable();
             $table->integer('show_id');
         });
     }

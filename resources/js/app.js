@@ -28,6 +28,11 @@ import ActShow from './Cms/Show/ActShow';
 import TicketList from './Cms/Show/TicketList';
 import Cinema from './Cms/Cinema/Cinema';
 import ActCinema from './Cms/Cinema/ActCinema';
+import Movies from './Client/Movies/Movies';
+import PaymentResult from './Client/Payment/PaymentResult';
+import About from './Client/about';
+import DetailsMovies from './Client/Movies/DetailsMovies';
+import User from './Client/User/User';
 
 
 function App() {
@@ -46,6 +51,12 @@ function App() {
                   <Route path='/book-ticket' element={<BookTicket />}/>
                   <Route path='/login' element={<Login />} />
                   <Route path='/register' element={<Register />} />
+                  <Route path='/logout' element={<Logout />} />
+                  <Route path='/movies' element={<Movies />} />
+                  <Route path='/movies/detail' element={<DetailsMovies />} />
+                  <Route path='/payment/result' element={<PaymentResult />} />
+                  <Route path='/about-us' element={<About />} />
+                  <Route path='/me' element={<User />} />
                   <Route path='/logout' element={<Logout />} />
               </Route>
               <Route path='/admin' element={<PrivateOutlet />}>

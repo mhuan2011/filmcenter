@@ -33,11 +33,22 @@ const CinemaHall = () => {
       title: 'Tên rạp',
       dataIndex: 'name',
       key: 'name',
+      width: 200,
     },
+    
     {
       title: 'Số ghế',
       dataIndex: 'total_seat',
       key: 'total_seat',
+      width: 100,
+    },
+    {
+      title: 'Rạp',
+      dataIndex: 'cinema',
+      key: 'cinema',
+      render: (_, record) => (
+        <>{record.cinema.name}</>
+      )
     },
     {
       title: 'Action',

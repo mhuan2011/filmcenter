@@ -40,12 +40,21 @@ const initchartData = {
   },
 };
 const Dashboard = () => {
-  const { user} = useContext(AppContext);
+  const { user, statisticByDate} = useContext(AppContext);
   const [data, setData] = useState({
-    time_start: '2022-05-01',
-    time_end: '2022-05-31',
+    time_start: '2022-08-01',
+    time_end: '2022-08-31',
     store_id: user ? user.store_id : 0,
   });
+
+  const [statistic, setStatistic] = useState({
+    amount: 0,
+    cinema: 0,
+    movies: 0,
+    users: 0
+  });
+
+
   const [stores, setStores] = useState();
   const [revenue, setRevenue] = useState();
   const [totalOrder, setTotalOrder] = useState();
@@ -58,7 +67,12 @@ const Dashboard = () => {
   }, [])
 
   useEffect(() => {
-   
+      if(data) {
+        statisticByDate(data).then((res) => {
+          setStatistic(res.data.data);
+        })
+      }
+      
   }, [data])
 
   useEffect(() => {
@@ -66,6 +80,15 @@ const Dashboard = () => {
   }, [rawData])
 
 
+
+  const onChangeDate = (dates, dateStrings) => {
+    // if (dates) {
+    //   console.log('From: ', dateStrings[0], ', to: ', dateStrings[1]);
+    // } else {
+    //   console.log('Clear');
+    // }
+    setData({ ...data, time_start: dateStrings[0], time_end: dateStrings[1] });
+  };
 
   return (
     <>
@@ -84,7 +107,8 @@ const Dashboard = () => {
         </Col>
         <Col span={8}>
           <RangePicker
-            defaultValue={[moment('2022-05-01', dateFormat), moment('2022-05-31', dateFormat)]}
+            defaultValue={[moment('2022-08-01', dateFormat), moment('2022-08-31', dateFormat)]}
+            onChange={onChangeDate}
             format={dateFormat}
             allowClear={false}
           />
@@ -93,20 +117,22 @@ const Dashboard = () => {
       <Row gutter={16} style={{ marginTop: '12px' }}>
         <Col className="gutter-row" span={6}>
           <Card title="Doanh thu" style={{ textAlign: "center" }}>
-            {`${100000}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} VND
+            {`${statistic.amount}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} VND
           </Card>
         </Col>
         <Col className="gutter-row" span={6}>
           <Card title="Tổng số phim" style={{ textAlign: "center" }}>
-            {totalOrder}
+            {statistic.movies}
           </Card>
         </Col>
         <Col className="gutter-row" span={6}>
           <Card title="Tổng số rạp" style={{ textAlign: "center" }}>
+            {statistic.cinema}
           </Card>
         </Col>
         <Col className="gutter-row" span={6}>
           <Card title="Số lượng nhân viên" style={{ textAlign: "center" }}>
+            {statistic.users}
           </Card>
         </Col>
       </Row>
