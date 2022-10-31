@@ -13,11 +13,11 @@ class CinemaController extends Controller
     //
     public function getCinemaWithMovie($id)
     {
-        $data = Cinema::selectRaw('cinema.name, cinema.id')
+        $data = Cinema::selectRaw('cinema.name, cinema.id, cinema.address')
             ->join('cinema_hall', 'cinema_hall.cinema_id', '=', 'cinema.id')
             ->join('show', 'show.cinema_hall_id', '=', 'cinema_hall.id')
             ->where('show.movie_id', $id)
-            ->groupBy('cinema.id', 'cinema.name')
+            ->groupBy('cinema.id', 'cinema.name', 'cinema.address')
             ->get();
 
         return response()->json([

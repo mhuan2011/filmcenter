@@ -12,6 +12,7 @@ use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ShowController;
 use App\Http\Controllers\StarController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -35,9 +36,12 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::post('/user/update', [AuthController::class, 'update'])->middleware('auth:sanctum');
+Route::post('/user/create', [UserController::class, 'creatAccount'])->middleware('auth:sanctum');
+Route::post('/user/detail', [UserController::class, 'getAccountDetail'])->middleware('auth:sanctum');
+Route::post('/user/update-account', [UserController::class, 'updateAccount'])->middleware('auth:sanctum');
 
 //Categories
-Route::get('/category/getlist', [CategoriesController::class, 'getlist'])->middleware('auth:sanctum');
+Route::get('/category/getlist', [CategoriesController::class, 'getlist']);
 Route::get('/category/getfilter', [CategoriesController::class, 'getfilter'])->middleware('auth:sanctum');
 Route::get('/category/getitem/{id}', [CategoriesController::class, 'getitem'])->middleware('auth:sanctum');
 Route::post('/category/store', [CategoriesController::class, 'store'])->middleware('auth:sanctum');
@@ -52,7 +56,7 @@ Route::post('/person/update', [PersonController::class, 'update'])->middleware('
 Route::get('/person/delete/{id}', [PersonController::class, 'delete'])->middleware('auth:sanctum');
 
 //Country
-Route::get('/country/getlist', [CountryController::class, 'getlist'])->middleware('auth:sanctum');
+Route::get('/country/getlist', [CountryController::class, 'getlist']);
 
 //Movies
 Route::get('/movies/getlist', [MoviesController::class, 'getlist']);
@@ -60,6 +64,7 @@ Route::get('/movies/getitem/{id}', [MoviesController::class, 'getitem']);
 Route::post('/movies/store', [MoviesController::class, 'store'])->middleware('auth:sanctum');
 Route::post('/movies/update', [MoviesController::class, 'update'])->middleware('auth:sanctum');
 Route::get('/movies/delete/{id}', [MoviesController::class, 'delete'])->middleware('auth:sanctum');
+Route::post('/movies/filter', [MoviesController::class, 'filtermovies']);
 
 //Cinema Hall
 
@@ -94,8 +99,9 @@ Route::get('/get-show-date', [ClientController::class, 'getShowDate']);
 Route::post('/getmovies-cinema-date', [ClientController::class, 'getMoviesWithCinemAndDate']);
 
 
-Route::get('/cinema/getitem-with-movie/{id}', [CinemaController::class, 'getCinemaWithMovie'])->middleware('auth:sanctum');
-Route::post('/getshow', [ClientController::class, 'getShowWithMovieCinema'])->middleware('auth:sanctum');
+Route::get('/cinema/getitem-with-movie/{id}', [CinemaController::class, 'getCinemaWithMovie']);
+Route::post('/getshow', [ClientController::class, 'getShowWithMovieCinema']);
+Route::get('/get-infor-with-order/{order_id}', [ClientController::class, 'getInforReservation']);
 
 
 // payment
@@ -112,3 +118,8 @@ Route::post('/get-actors', [StarController::class, 'getActors']);
 
 //Dashboard
 Route::post('/statistic-by-date', [ClientController::class, 'statistic'])->middleware('auth:sanctum');
+
+Route::post('/revenue-by-date', [ClientController::class, 'revenueByDate'])->middleware('auth:sanctum');
+Route::get('/cinemahall-of-cinema', [ClientController::class, 'cinemaHallOfCinema'])->middleware('auth:sanctum');
+// user 
+Route::get('/user/getlist', [UserController::class, 'getlist'])->middleware('auth:sanctum');

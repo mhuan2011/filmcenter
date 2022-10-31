@@ -33,28 +33,29 @@ const TicketList = () => {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
-      width: 100,
+      width: 70,
     },
     {
       title: 'Số ghế',
       dataIndex: 'seat_id',
       key: 'seat_id',
+      width: 100,  
       render: (_, record) => {
         return (
-          <>{record.seat.row+record.seat.number}</>
+          <>{record.row+record.number}</>
         )
       }
     },
-    {
-      title: 'Giá',
-      dataIndex: 'price',
-      key: 'price',
-      render: (price)=> {
-        return (
-          <>{helper.formatCurrency(price)}</>
-        )
-      }
-    },
+    // {
+    //   title: 'Giá',
+    //   dataIndex: 'price',
+    //   key: 'price',
+    //   render: (price)=> {
+    //     return (
+    //       <>{helper.formatCurrency(price)}</>
+    //     )
+    //   }
+    // },
     {
       title: 'Trạng thái',
       dataIndex: 'status',
@@ -70,9 +71,24 @@ const TicketList = () => {
       }
     },
     {
+      title: 'Mã đặt vé',
+      dataIndex: 'reservation_id',
+      key: 'reservation_id',
+      render: (reservation_id)=> {
+        return (
+          <>{reservation_id}</>
+        )
+      }
+    },
+    {
       title: 'Khách hàng',
-      dataIndex: 'customer',
-      key: 'customer',
+      dataIndex: 'username',
+      key: 'username',
+      render: (username)=> {
+        return (
+          <>{username}</>
+        )
+      }
     },
     {
       title: 'Action',

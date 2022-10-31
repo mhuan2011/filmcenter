@@ -65,7 +65,7 @@ const ActCinemalHall = () => {
         const formData = new FormData();
         if (params.id) formData.append("id", params.id)
         if (values.name) formData.append("name", values.name)
-        if (values.cinema) formData.append("cinema", values.cinema)
+        if (values.cinema) formData.append("cinema", values.cinema_id)
         if (values.total_seat) formData.append("total_seat", values.total_seat)
 
         if (params.id) {
@@ -131,7 +131,7 @@ const ActCinemalHall = () => {
                   </Form.Item>       
                   <Form.Item
                     label="Rạp"
-                    name="cinema"
+                    name="cinema_id"
                     style={{ marginBottom: 15 }}
                     rules={[{ required: true, message: 'Please Input name' }]}
                   >

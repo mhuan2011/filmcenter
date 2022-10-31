@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 // import { openNotification } from '../Helpers/Notification';
 import { AppContext } from '../Context.js';
+import { openNotification } from './Helper/Notification.js';
 
 const Login = () => {
   const { setUser, cart_length } = useContext(AppContext);
@@ -25,7 +26,7 @@ const Login = () => {
             navigate("/")
           }
         };
-        // openNotification(response.data);
+        openNotification(response.data);
       })
       .catch((error) => {
         setLoading(false)

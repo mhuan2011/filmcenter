@@ -24,6 +24,23 @@ class ReservationController extends Controller
             $now = Carbon::now();
             $unique_code = $now->format('YmdHisu');
 
+            // checl
+
+            $c = false;
+            foreach ($seats as $seat) {
+                $check = ShowSeat::where('id', $seat)->first();
+                if ($check->status == 1) {
+                    $c = true;
+                }
+            }
+            if ($c == true) {
+                return response()->json([
+                    'status' => false,
+                    'message' => "Bạn chậm mất rồi! ghế bạn chọn đã được mua, bạn vui lòng chọn ghế khác!"
+                ]);
+            }
+
+            // end check 
             $user = User::find($user_id);
             if ($user) {
                 $new = new Reservation();

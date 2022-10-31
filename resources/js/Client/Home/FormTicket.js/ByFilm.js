@@ -11,7 +11,7 @@ const { TabPane } = Tabs;
 const {Option} = Select;
 const ByFilm = () => {
   let navigate = useNavigate();
-  const { getMoviesShow, getCinemaWithMovie , getShowWithCinemaMovies } = useContext(AppContext);
+  const { user, getMoviesShow, getCinemaWithMovie , getShowWithCinemaMovies } = useContext(AppContext);
 
   const [movies, setMovies] = useState([]);
   const [cinema, setCinema] = useState([]);
@@ -73,7 +73,11 @@ const ByFilm = () => {
           if(!showID) {
             helper.notification({status: "warning", message: "Vui lòng suất chiếu!!!"})
           }else {
-            navigate(`/book-ticket?movieId=${movieID}&cinemaId=${cinemaID}&showId=${showID}`);
+            if(user.role_id != "") {
+              navigate(`/book-ticket?movieId=${movieID}&cinemaId=${cinemaID}&showId=${showID}`);
+            }else {
+              helper.notification({status: "warning", message: "Vui lòng đăng nhập để mua vé!!!"})
+            }
           }
         }
       }

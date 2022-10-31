@@ -2,10 +2,12 @@ import { Button, Card, Form, Input, Radio, Select } from 'antd';
 import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../../Context';
 const Option = Select.Option;
+
+import { openNotification } from '../../Helper/Notification';
 const OrderForm = ({ticketInfor, total}) => {
     const { user, getPaymentMomo, getPaymentVnPay, reservation } = useContext(AppContext);
     const [form] = Form.useForm();
-
+    const [loading, setLoading] = useState(false);
     useEffect(() => {
         form.setFieldsValue({ payment_methods: 'momo', name: user.name, email: user.email, phone: user.phone })
     },[])
@@ -39,12 +41,16 @@ const OrderForm = ({ticketInfor, total}) => {
                     reserveSeat: seats, 
                     user_id: user.id
                 }
+                setLoading(true);
                 reservation(values).then((res) => {
                     if(res.data.status) {
                        let info = {amount: total, orderId: res.data.data.reservation_id+'', url: window.location.href};
+                       setLoading(false);
                        getPaymentMomo(info).then((res) => {
                         window.open(res.data.url,"_self");
                         }) 
+                    }else {
+                        openNotification(res.data);
                     }
                 })
                 break;
@@ -96,7 +102,7 @@ const OrderForm = ({ticketInfor, total}) => {
                 <Select  >
                     <Option value="momo">Ví điện tử Momo</Option>
                     <Option value="vnpay">Ví điện tử VNPAY</Option>
-                    <Option value="zalopay">Ví điện tử Zalo Pay</Option>
+                    <Option disabled value="zalopay">Ví điện tử Zalo Pay</Option>
                 </Select>
             </Form.Item>
             <Form.Item label="Họ và tên" name='name'   rules={[{ required: true, message: 'Nhập họ và tên!' }]}>
@@ -110,11 +116,8 @@ const OrderForm = ({ticketInfor, total}) => {
             </Form.Item>
 
             <Form.Item {...tailLayout}>
-                <Button type="primary" htmlType="submit" style={{marginRight: '10px'}}>
+                <Button type="primary" htmlType="submit" style={{marginRight: '10px'}} loading={loading}>
                     Xác nhận
-                </Button>
-                <Button htmlType="button" >
-                    Quay lại
                 </Button>
             </Form.Item>
 

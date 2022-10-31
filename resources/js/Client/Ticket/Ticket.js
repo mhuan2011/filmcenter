@@ -1,5 +1,5 @@
 import { ScheduleOutlined, VideoCameraOutlined } from '@ant-design/icons';
-import { Button, Card, Carousel, Col, Collapse, Input, List, Menu, Row, Select, Spin, Tabs, Tag } from 'antd';
+import { Button, Card, Carousel, Col, Collapse, Input, List, Menu, Popover, Row, Select, Spin, Tabs, Tag } from 'antd';
 import Meta from 'antd/lib/card/Meta.js';
 import { stubString } from 'lodash';
 import moment from 'moment';
@@ -21,9 +21,10 @@ const bookingInfor = {
 }
 
 const Ticket = () => {
+  let navigate = useNavigate();
   const [selected, setSelected] = useState('');
   const [selectTheater, setSelectTheater] = useState('');
-  const { getMoviesShow, getCinemaWithMovie, getShowWithCinemaMovies  } = useContext(AppContext);
+  const { user,  getMoviesShow, getCinemaWithMovie, getShowWithCinemaMovies  } = useContext(AppContext);
   const [movies, setMovies] = useState([]);
   const [cinema, setCinema  ] = useState([]);
   const [show, setShow  ] = useState([]);
@@ -50,12 +51,13 @@ const Ticket = () => {
           label: 
             <div>
               <Row >
-                  <Col span={8} >
+                  <Col span={8} style={{overflow: 'hidden'}}>
                   <img style={{height: '100px'}} src={APP_URL + '/images/movies' + item.image}></img>
                   </Col>
-                  <Col span={16} >
+                  <Col span={16} style={{paddingLeft: '5px'}}>
                     <h3 style={{margin: 0}}> {item.title}</h3>
-                    Ngôn ngữ: {item.language} <Tag color="#f50">16+</Tag>
+                    Ngôn ngữ: {item.language} 
+                    {/* <Tag color="#f50">16+</Tag> */}
                   </Col>
               </Row>
             </div>
@@ -73,15 +75,20 @@ const Ticket = () => {
       listCinema.map((item, index) => {
         var temp = {
           key: item.id,
-          height: '100px',
+          height: "200px",
           label: 
             <div>
               <Row style={{padding: 10}} justify="space-between">
-                <Col><p style={{margin: 0}}>{item.name}</p></Col>
                 <Col>
-                  <Button>Xem vị trí</Button>
+                <p style={{margin: 0}}>{item.name}</p>
+                </Col>
+                <Col>
+                  <Popover placement="bottom" title={"Địa chỉ"} content={item.address} trigger="hover">
+                    <Button>Xem vị trí</Button>
+                  </Popover>
                 </Col>
               </Row>
+              
             </div>
           ,
         }
@@ -118,6 +125,14 @@ const Ticket = () => {
           setLoadingShow(false);
         });
       }
+  }
+
+  const buyTicket = (detail) => {
+    if(user.role_id != "") {
+      navigate(`/book-ticket?movieId=${selected}&cinemaId=${selectTheater}&showId=${detail.id}`);
+    }else {
+      helper.notification({status: "warning", message: "Vui lòng đăng nhập để mua vé!!!"})
+    }
   }
 
   return (
@@ -191,7 +206,7 @@ const Ticket = () => {
                                       }}
                                     >
                                       <Spin spinning={loadingShow}>
-                                      {show.length == 0 ? <Meta  description="Vui lòng chọn suất chiếu" /> :  <Collapse  >{
+                                      {show.length == 0 ? <Meta  description="Vui lòng chọn rạp" /> :  <Collapse  >{
                                         show.map((item, index) => (
                                           <Panel header={helper.formatDateToShow(item.date)} key={index}>
                                             <Row>
@@ -201,7 +216,7 @@ const Ticket = () => {
                                               <Col span={16}>
                                                 <Row gutter={[16, 16]}>
                                                   {item.show.map((detail) => (
-                                                    <Col key={detail.id}><Link to={`/book-ticket?movieId=${selected}&cinemaId=${selectTheater}&showId=${detail.id}` } ><Button>{ moment(detail.start_time, "HH:mm:ss").format("hh:mm")}</Button></Link></Col>
+                                                    <Col key={detail.id}><Button onClick={() => buyTicket(detail)}>{ moment(detail.start_time, "HH:mm:ss").format("hh:mm")}</Button></Col>
                                                   ))
                                                   }
                                                 </Row>

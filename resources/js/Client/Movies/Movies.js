@@ -6,8 +6,11 @@ import MovieItem from './MovieItem.js';
 
 const Option = Select.Option;
 const Movies = () => {
-    const { getListMovies } = useContext(AppContext);
+    const { getListMovies, getListCategory, getListCountry, filterMovies} = useContext(AppContext);
     const [data, setData] = useState([]);
+    const [category, setCategory] = useState([]);
+    const [country, setCountry] = useState([]);
+
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(true);
     useEffect(() => {
@@ -15,10 +18,38 @@ const Movies = () => {
         setData(res.data.data);
         setLoading(false);
       })
+
+      getListCategory().then((res) => {
+        setCategory(res.data.data);
+      })
+
+      getListCountry().then((res) => {
+        setCountry(res.data.data);
+      })
     }, [])
 
     const handleChange = (value) => {
       console.log(`selected ${value}`);
+    };
+
+    const onFinish = (values) => {
+      setLoading(true);
+      var val = {};
+      if(values.title ) {
+        val.title = values.title;
+      }
+      if(values.category ) {
+        val.category = values.category;
+      }
+
+      if(values.country ) {
+        val.country = values.country;
+      }
+
+      filterMovies(val).then((res)=>{
+        setData(res.data.data);
+        setLoading(false);
+      })
     };
   return (
     <div className="list-movies">
@@ -27,13 +58,14 @@ const Movies = () => {
                 <br />
                 <Card bordered={false}>
                     <Spin tip="Đang tải..." spinning={loading}>
-                        <Card title="PHIM ĐANG CHIẾU" bordered={false}>
+                        <Card title="DANH SÁCH PHIM" bordered={false}>
                           
                             <Row gutter={[4, 4]}>
                                 <Form
                                   layout="inline"
                                   form={form}
                                   labelAlign="left"
+                                  onFinish={onFinish}
                                 >
                                   <Form.Item
                                     label="Tên phim"
@@ -48,17 +80,20 @@ const Movies = () => {
                                     style={{ marginBottom: 15 }}
                                   >
                                       <Select
+                                        showSearch
                                         style={{
-                                          width: 120,
+                                          width: 220,
                                         }}
-                                        onChange={handleChange}
+                                        allowClear
+                                        placeholder="Chọn thể loại"
                                       >
-                                        <Option value="jack">Jack</Option>
-                                        <Option value="lucy">Lucy</Option>
-                                        <Option value="disabled" disabled>
-                                          Disabled
-                                        </Option>
-                                        <Option value="Yiminghe">yiminghe</Option>
+                                        {
+                                          category.map((item, index) => (
+                                               <Option value={item.id} key={index}>{item.name}</Option>
+                                            )
+                                          ) 
+                                            
+                                        }
                                       </Select>
                                   </Form.Item>
                                   <Form.Item
@@ -68,30 +103,31 @@ const Movies = () => {
                                   >
                                       <Select
                                         style={{
-                                          width: 120,
+                                          width: 180,
                                         }}
-                                        onChange={handleChange}
+                                        showSearch
+                                        allowClear
+                                        placeholder="Chọn quốc gia"
                                       >
-                                        <Option value="jack">Jack</Option>
-                                        <Option value="lucy">Lucy</Option>
-                                        <Option value="disabled" disabled>
-                                          Disabled
-                                        </Option>
-                                        <Option value="Yiminghe">yiminghe</Option>
+                                        {
+                                          country.map((item, index) => (
+                                               <Option value={item.id} key={index}>{item.name}</Option>
+                                            )
+                                          ) 
+                                            
+                                        }
                                       </Select>
                                   </Form.Item>
                                   <Form.Item>
-                                    <Button type="primary" >Lọc</Button>
+                                    <Button type="primary" htmlType="submit" >Lọc</Button>
                                   </Form.Item>
                               </Form>
                             </Row>
                             
                             <Row gutter={[16, 16]} style={{marginTop: '10px'}}>
-                                
                                  {data.map((item, index)=> (
                                     <MovieItem key={index} item = {item}/>
                                  ))}
-                                 
                             </Row>
                            
                         </Card>

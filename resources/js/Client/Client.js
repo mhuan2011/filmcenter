@@ -1,4 +1,4 @@
-import { Avatar, Badge, Button, Col, Drawer, Dropdown, Empty, Form, Layout, Menu, Row } from 'antd';
+import { Avatar, Badge, Button, Col, Drawer, Dropdown, Empty, Form, Layout, List, Menu, Popover, Row } from 'antd';
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { UserOutlined, DownOutlined, ShoppingCartOutlined, MailOutlined, AppstoreOutlined, SettingOutlined, MenuOutlined, BellOutlined } from '@ant-design/icons';
@@ -57,16 +57,45 @@ const Client = () => {
       label: <Link to='/logout'>Đăng xuất</Link>,
     },
   ]
-  const menu = (
-    <Menu items={dropDownItem} >
-    </Menu>
-  );
+  const menu =() => {
+    if((user.role_id == 1 || user.role_id == 2) && dropDownItem.length == 3) {
+      dropDownItem.push(
+        {
+          key: '4',
+          label: <Link to='/admin'>CMS</Link>,
+        },
+      )
+    }
+    return (
+      <Menu items={dropDownItem} >
+      </Menu>
+    )
+  };
 
   const onClick = (e) => {
     setSelected(e.key);
   };
 
+  const data = [
+    'Racing car sprays burning fuel into crowd.',
+    'Japanese princess to wed commoner.',
+    'Australian walks 100km after outback crash.',
+    'Man charged over missing wedding girl.',
+    'Los Angeles battles huge wildfires.',
+  ];
 
+  const notice = () => {
+    return (
+      <List
+        size="small"
+        header={<div>Header</div>}
+        footer={<div>Footer</div>}
+        bordered
+        dataSource={data}
+        renderItem={(item) => <List.Item>{item}</List.Item>}
+      />
+    )
+  }
   
   return (
     <>
@@ -93,11 +122,11 @@ const Client = () => {
                           <Dropdown overlay={menu} trigger={['click']}>
                             <Avatar style={{marginLeft: '4px'}} icon={<UserOutlined />} /> 
                           </Dropdown>
-                          <Dropdown overlay={menu}  placement="bottomLeft" arrow>
-                            <Badge  count={1}>
+                          <Popover placement="bottomRight" title={"Thông báo"} content={notice} trigger="click" style={{width: 300}}>
+                             <Badge  count={1}>
                               <Avatar style={{marginLeft: '10px'}} icon={<BellOutlined />} />
                             </Badge>
-                          </Dropdown>
+                          </Popover>
                       </>}
             </div>
           </div>

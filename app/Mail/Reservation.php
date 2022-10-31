@@ -11,16 +11,19 @@ class Reservation extends Mailable
 {
     use Queueable, SerializesModels;
     public $data;
-
+    public $name;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($data)
+    public function __construct($order_id, $name)
     {
         //
-        $this->data = $data;
+        $this->data = [
+            'order_id' => $order_id,
+            'name' => $name
+        ];
     }
 
     /**

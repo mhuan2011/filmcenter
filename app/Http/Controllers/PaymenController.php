@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendOrdermail;
 use App\Models\Payment;
 use App\Models\Reservation;
 use App\Models\Show;
@@ -199,110 +200,161 @@ class PaymenController extends Controller
     {
         $data = $request->all();
 
-        $inputData = array();
-        $returnData = array();
+        $method = $data['method'];
+        $values = $data['values'];
+        if ($method == 'vnpay') {
 
-        foreach ($data as  $value) {
-            if (substr($value['key'], 0, 4) == "vnp_") {
+            $data = $data['values'];
+            $inputData = array();
+            $returnData = array();
+
+            foreach ($data as  $value) {
+                if (substr($value['key'], 0, 4) == "vnp_") {
+                    $inputData[$value['key']] = $value['value'];
+                }
+            }
+
+            $vnp_SecureHash = $inputData['vnp_SecureHash'];
+            // unset($inputData['vnp_SecureHash']);
+            ksort($inputData);
+            $i = 0;
+            $hashData = "";
+            foreach ($inputData as $key => $value) {
+                if ($i == 1) {
+                    $hashData = $hashData . '&' . urlencode($key) . "=" . urlencode($value);
+                } else {
+                    $hashData = $hashData . urlencode($key) . "=" . urlencode($value);
+                    $i = 1;
+                }
+            }
+
+
+
+            $secureHash = hash_hmac('sha512', $hashData, 'GNMZUTNBGARDLSUPKTZGSXRFMKHCHYMH');
+
+            $vnpTranId = $inputData['vnp_TransactionNo']; //Mã giao dịch tại VNPAY
+            $vnp_BankCode = $inputData['vnp_BankCode']; //Ngân hàng thanh toán
+            $vnp_Amount = $inputData['vnp_Amount'] / 100; // Số tiền thanh toán VNPAY phản hồi
+
+            $Status = 0; // Là trạng thái thanh toán của giao dịch chưa có IPN lưu tại hệ thống của merchant chiều khởi tạo URL thanh toán.
+            $orderId = $inputData['vnp_TxnRef'];
+
+            try {
+                //Check Orderid    
+                //Kiểm tra checksum của dữ liệu
+                // if ($secureHash == $vnp_SecureHash) {
+                if (true) {
+                    //Lấy thông tin đơn hàng lưu trong Database và kiểm tra trạng thái của đơn hàng, mã đơn hàng là: $orderId            
+                    //Việc kiểm tra trạng thái của đơn hàng giúp hệ thống không xử lý trùng lặp, xử lý nhiều lần một giao dịch
+                    //Giả sử: $order = mysqli_fetch_assoc($result);   
+                    $order = Reservation::where("id", $inputData['vnp_TxnRef'])->first();
+                    if ($order != NULL) {
+                        // if ($order["Amount"] == $vnp_Amount) //Kiểm tra số tiền thanh toán của giao dịch: giả sử số tiền kiểm tra là đúng. //$order["Amount"] == $vnp_Amount
+                        // {
+                        if ($order["status"] != NULL && $order["status"] == 'Chưa thanh toán') {
+                            if ($inputData['vnp_ResponseCode'] == '00' || $inputData['vnp_TransactionStatus'] == '00') {
+                                $Status = "Thanh toán"; // Trạng thái thanh toán thành công
+                            } else {
+                                $Status = "Không thành công"; // Trạng thái thanh toán thất bại / lỗi
+                            }
+
+                            $res = Reservation::where('id', $inputData['vnp_TxnRef'])->update(['status' => $Status]);
+                            if ($res) {
+                                $new = new Payment();
+                                $new->amount = $vnp_Amount;
+                                $new->methods = 'VnPay';
+                                $new->reservation_id = $orderId;
+
+                                $result = $new->save();
+
+                                $user = Reservation::selectRaw('users.email')->join("users", 'users.id', '=', 'reservation.user_id')->where("reservation.id", $inputData['vnp_TxnRef'])->first();
+                                if ($user) {
+                                    $this->sendMail($user->email, "THONG TIN DON HANG");
+                                }
+                            }
+                            //Trả kết quả về cho VNPAY: Website/APP TMĐT ghi nhận yêu cầu thành công                
+                            $returnData['RspCode'] = '00';
+                            $returnData['Message'] = 'Confirm Success';
+                            $returnData['OrderID'] = $orderId;
+                        } else {
+                            $returnData['RspCode'] = '02';
+                            $returnData['Message'] = 'Order already confirmed';
+                        }
+                        // } else {
+                        //     $returnData['RspCode'] = '04';
+                        //     $returnData['Message'] = 'invalid amount';
+                        // }
+                    } else {
+                        $returnData['RspCode'] = '01';
+                        $returnData['Message'] = 'Order not found';
+                    }
+                } else {
+                    $returnData['RspCode'] = '97';
+                    $returnData['Message'] = 'Invalid signature';
+                }
+            } catch (Exception $e) {
+                $returnData['RspCode'] = '99';
+                $returnData['Message'] = 'Unknow error';
+                $returnData['Error'] = $e;
+            }
+            //Trả lại VNPAY theo định dạng JSON
+            // echo json_encode($returnData);
+
+        } else if ($method == 'momo') {
+
+            $inputData = array();
+            $returnData = array();
+
+            foreach ($values as  $value) {
                 $inputData[$value['key']] = $value['value'];
             }
-        }
 
-        $vnp_SecureHash = $inputData['vnp_SecureHash'];
-        // unset($inputData['vnp_SecureHash']);
-        ksort($inputData);
-        $i = 0;
-        $hashData = "";
-        foreach ($inputData as $key => $value) {
-            if ($i == 1) {
-                $hashData = $hashData . '&' . urlencode($key) . "=" . urlencode($value);
+            $Status = '';
+            if ($inputData['resultCode'] == '0') {
+                $Status = "Thanh toán"; // Trạng thái thanh toán thành công
             } else {
-                $hashData = $hashData . urlencode($key) . "=" . urlencode($value);
-                $i = 1;
+                $Status = "Không thành công"; // Trạng thái thanh toán thất bại / lỗi
+                $res = Reservation::where('id', $inputData['orderId'])->update(['status' => $Status]);
+                $returnData['RspCode'] = '99';
+                $returnData['Message'] = 'Unknow error';
+                return $returnData;
             }
-        }
 
 
+            $res = Reservation::where('id', $inputData['orderId'])->update(['status' => $Status]);
 
-        $secureHash = hash_hmac('sha512', $hashData, 'GNMZUTNBGARDLSUPKTZGSXRFMKHCHYMH');
+            if ($res) {
+                $new = new Payment();
+                $new->amount = $inputData['amount'];
+                $new->methods = 'Momo';
+                $new->reservation_id = $inputData['orderId'];
 
-        $vnpTranId = $inputData['vnp_TransactionNo']; //Mã giao dịch tại VNPAY
-        $vnp_BankCode = $inputData['vnp_BankCode']; //Ngân hàng thanh toán
-        $vnp_Amount = $inputData['vnp_Amount'] / 100; // Số tiền thanh toán VNPAY phản hồi
+                $result = $new->save();
 
-        $Status = 0; // Là trạng thái thanh toán của giao dịch chưa có IPN lưu tại hệ thống của merchant chiều khởi tạo URL thanh toán.
-        $orderId = $inputData['vnp_TxnRef'];
-
-        try {
-            //Check Orderid    
-            //Kiểm tra checksum của dữ liệu
-            // if ($secureHash == $vnp_SecureHash) {
-            if (true) {
-                //Lấy thông tin đơn hàng lưu trong Database và kiểm tra trạng thái của đơn hàng, mã đơn hàng là: $orderId            
-                //Việc kiểm tra trạng thái của đơn hàng giúp hệ thống không xử lý trùng lặp, xử lý nhiều lần một giao dịch
-                //Giả sử: $order = mysqli_fetch_assoc($result);   
-                $order = Reservation::where("id", $inputData['vnp_TxnRef'])->first();
-                if ($order != NULL) {
-                    // if ($order["Amount"] == $vnp_Amount) //Kiểm tra số tiền thanh toán của giao dịch: giả sử số tiền kiểm tra là đúng. //$order["Amount"] == $vnp_Amount
-                    // {
-                    if ($order["status"] != NULL && $order["status"] == 'Chưa thanh toán') {
-                        if ($inputData['vnp_ResponseCode'] == '00' || $inputData['vnp_TransactionStatus'] == '00') {
-                            $Status = "Thanh toán"; // Trạng thái thanh toán thành công
-                        } else {
-                            $Status = "Không thành công"; // Trạng thái thanh toán thất bại / lỗi
-                        }
-
-                        $res = Reservation::where('id', $inputData['vnp_TxnRef'])->update(['status' => $Status]);
-                        if ($res) {
-                            $new = new Payment();
-                            $new->amount = $vnp_Amount;
-                            $new->methods = 'VnPay';
-                            $new->reservation_id = $orderId;
-
-                            $result = $new->save();
-
-                            $user = Reservation::selectRaw('users.email')->join("users", 'users.id', '=', 'reservation.user_id')->where("reservation.id", $inputData['vnp_TxnRef'])->first();
-                            if ($user) {
-                                $this->sendMail($user->email, "THONG TIN DON HANG");
-                            }
-                        }
-                        //Trả kết quả về cho VNPAY: Website/APP TMĐT ghi nhận yêu cầu thành công                
-                        $returnData['RspCode'] = '00';
-                        $returnData['Message'] = 'Confirm Success';
-                        $returnData['OrderID'] = $orderId;
-                    } else {
-                        $returnData['RspCode'] = '02';
-                        $returnData['Message'] = 'Order already confirmed';
-                    }
-                    // } else {
-                    //     $returnData['RspCode'] = '04';
-                    //     $returnData['Message'] = 'invalid amount';
-                    // }
-                } else {
-                    $returnData['RspCode'] = '01';
-                    $returnData['Message'] = 'Order not found';
+                $user = Reservation::selectRaw('users.email')->join("users", 'users.id', '=', 'reservation.user_id')->where("reservation.id", $inputData['orderId'])->first();
+                if ($user) {
+                    $dataResult = $this->getInforReservation($inputData['orderId']);
+                    $emailJob = new SendOrdermail($user->email,  $inputData['orderId'], $dataResult['user'][0]->name);
+                    dispatch($emailJob);
                 }
+                $returnData['RspCode'] = '00';
+                $returnData['Message'] = 'Confirm Success';
+                $returnData['OrderID'] = $inputData['orderId'];
+                $returnData['data'] = $dataResult;
+                $returnData['mail'] = $user->email;
             } else {
-                $returnData['RspCode'] = '97';
-                $returnData['Message'] = 'Invalid signature';
+                $returnData['RspCode'] = '99';
+                $returnData['Message'] = 'Unknow error';
             }
-        } catch (Exception $e) {
-            $returnData['RspCode'] = '99';
-            $returnData['Message'] = 'Unknow error';
-            $returnData['Error'] = $e;
+            return $returnData;
         }
-        //Trả lại VNPAY theo định dạng JSON
-        // echo json_encode($returnData);
-
-        return $returnData;
     }
 
 
     //
     public function sendMail($mail, $data)
     {
-        Mail::to($mail)->send(new MailReservation($data));
-        $da = $this->getInforReservation(32);
+        // Mail::to($mail)->send(new MailReservation($data));
     }
 
     public function getInforReservation($order_id)
@@ -325,7 +377,8 @@ class PaymenController extends Controller
         $data = [
             'seat' => $seat,
             'show_infor' => $show_infor,
-            'user' => $user
+            'user' => $user,
+            'order_id' => $order_id
         ];
 
         return $data;

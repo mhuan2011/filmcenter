@@ -1,9 +1,16 @@
 import React, { useState, useEffect, useContext } from 'react'
 import moment from 'moment';
-import { Row, Col, Card, DatePicker, Select } from 'antd';
+import { Row, Col, Card, DatePicker, Select, Spin } from 'antd';
 import { AppContext } from '../Context'; 
+import Highcharts from 'highcharts'
+// import HighchartsReact from 'highcharts-react-official'
+
 import Chart from "react-apexcharts";
+import CinemaChart from './Dashboard/CinemaChart';
+
 const { RangePicker } = DatePicker;
+
+
 const dateFormat = 'YYYY-MM-DD';
 const initchartData = {
   series: [{
@@ -36,14 +43,17 @@ const initchartData = {
     },
     xaxis: {
       categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+    },
+    stroke: {
+      curve: 'smooth',
     }
   },
 };
 const Dashboard = () => {
-  const { user, statisticByDate} = useContext(AppContext);
+  const { user, statisticByDate, revenueByDate} = useContext(AppContext);
   const [data, setData] = useState({
-    time_start: '2022-08-01',
-    time_end: '2022-08-31',
+    time_start: '2022-09-01',
+    time_end: '2022-9-30',
     store_id: user ? user.store_id : 0,
   });
 
@@ -55,6 +65,7 @@ const Dashboard = () => {
   });
 
 
+  const [loading, setLoading] = useState(false);
   const [stores, setStores] = useState();
   const [revenue, setRevenue] = useState();
   const [totalOrder, setTotalOrder] = useState();
@@ -68,27 +79,72 @@ const Dashboard = () => {
 
   useEffect(() => {
       if(data) {
+        setLoading(true);
         statisticByDate(data).then((res) => {
           setStatistic(res.data.data);
+          
         })
+        revenueByDate(data).then((res) => {
+          setRawData(res.data.data);
+          setLoading(false);
+        })
+
       }
       
   }, [data])
 
-  useEffect(() => {
-    
-  }, [rawData])
-
-
-
   const onChangeDate = (dates, dateStrings) => {
-    // if (dates) {
-    //   console.log('From: ', dateStrings[0], ', to: ', dateStrings[1]);
-    // } else {
-    //   console.log('Clear');
-    // }
     setData({ ...data, time_start: dateStrings[0], time_end: dateStrings[1] });
   };
+
+  useEffect(() => {
+    console.log(rawData)
+    console.log(chartData.series[0].data)
+    let arr = [];
+    let arrData = [];
+    if (rawData) {
+      rawData.map((i) => {
+        arr.push(parseInt(i.amount))
+        arrData.push(i.created_at.slice(0, 10))
+      })
+    }
+    let series = [{
+      name: "Tổng tiền",
+      data: arr,
+    }]
+    let options = {
+      chart: {
+        height: 350,
+        type: 'line',
+        zoom: {
+          enabled: false
+        }
+      },
+      dataLabels: {
+        enabled: false
+      },
+      stroke: {
+        curve: 'straight'
+      },
+      title: {
+        text: 'Bảng doanh thu theo ngày',
+        align: 'left'
+      },
+      grid: {
+        row: {
+          colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+          opacity: 0.5
+        },
+      },
+      xaxis: {
+        categories: arrData,
+      },
+      stroke: {
+        curve: 'smooth',
+      }
+    }
+    setChartData({ ...chartData, series, options })
+  }, [rawData])
 
   return (
     <>
@@ -107,7 +163,7 @@ const Dashboard = () => {
         </Col>
         <Col span={8}>
           <RangePicker
-            defaultValue={[moment('2022-08-01', dateFormat), moment('2022-08-31', dateFormat)]}
+            defaultValue={[moment('2022-09-01', dateFormat), moment('2022-09-30', dateFormat)]}
             onChange={onChangeDate}
             format={dateFormat}
             allowClear={false}
@@ -116,28 +172,43 @@ const Dashboard = () => {
       </Row>
       <Row gutter={16} style={{ marginTop: '12px' }}>
         <Col className="gutter-row" span={6}>
-          <Card title="Doanh thu" style={{ textAlign: "center" }}>
-            {`${statistic.amount}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} VND
-          </Card>
+          <Spin spinning={loading}>
+            <Card title="Doanh thu" style={{ textAlign: "center" }}>
+              { statistic.amount ? `${statistic.amount}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : 0} VND
+            </Card>
+          </Spin>
         </Col>
         <Col className="gutter-row" span={6}>
+          <Spin spinning={loading}>
           <Card title="Tổng số phim" style={{ textAlign: "center" }}>
             {statistic.movies}
           </Card>
+          </Spin>
+          
         </Col>
         <Col className="gutter-row" span={6}>
+          <Spin spinning={loading}>
           <Card title="Tổng số rạp" style={{ textAlign: "center" }}>
             {statistic.cinema}
           </Card>
+          </Spin>
         </Col>
         <Col className="gutter-row" span={6}>
-          <Card title="Số lượng nhân viên" style={{ textAlign: "center" }}>
-            {statistic.users}
-          </Card>
+          <Spin spinning={loading}>
+            <Card title="Số lượng nhân viên" style={{ textAlign: "center" }}>
+              {statistic.users}
+            </Card>
+            </Spin>
         </Col>
       </Row>
-
-      {/* <Chart options={chartData.options} series={chartData.series} type="line" height={350} /> */}
+      <Row style={{ marginTop: '12px' }}> 
+          <Col span={12}>
+            <Chart options={chartData.options} series={chartData.series} type="line" height={350} />
+          </Col>
+          <Col span={12}>
+            <CinemaChart dataDate={data}/>
+          </Col>
+      </Row>
     </>
   )
 }

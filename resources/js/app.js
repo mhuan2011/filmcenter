@@ -33,6 +33,9 @@ import PaymentResult from './Client/Payment/PaymentResult';
 import About from './Client/about';
 import DetailsMovies from './Client/Movies/DetailsMovies';
 import User from './Client/User/User';
+import Scan from './Cms/Scan/Scan';
+import UserList from './Cms/User/UserList';
+import ActUser from './Cms/User/ActUser';
 
 
 function App() {
@@ -41,6 +44,12 @@ function App() {
         const auth = user.role_id ? user.role_id : false;
         return auth ? <Cms/> : <Navigate to="/" />;
       }
+
+    function BuyCheck() {
+      const { user } = useContext(AppContext);
+      const auth = user.role_id != "";
+      return auth ? <BookTicket/> : <Navigate to="/" />;
+    }
     return (
         <div className='App'>
           <Routes>
@@ -48,7 +57,7 @@ function App() {
                   <Route index element={<Home />} />
                   <Route path='/category' element={<Category />} />
                   <Route path='/ticket' element={<Ticket />}/>
-                  <Route path='/book-ticket' element={<BookTicket />}/>
+                  <Route path='/book-ticket' element={<BuyCheck />}/>
                   <Route path='/login' element={<Login />} />
                   <Route path='/register' element={<Register />} />
                   <Route path='/logout' element={<Logout />} />
@@ -75,9 +84,13 @@ function App() {
                 <Route path='show/detail' element={<ActShow/>}/>
                 <Route path='show/detail/:id' element={<ActShow/>}/>
                 <Route path='show/ticket' element={<TicketList/>}/>
+                <Route path='scan' element={<Scan/>}/>
                 <Route path='cinema' element={<Cinema/>}/>
                 <Route path='cinema/detail' element={<ActCinema/>}/>
                 <Route path='cinema/detail/:id' element={<ActCinema/>}/>
+                <Route path='users' element={<UserList/>}/>
+                <Route path='users/detail' element={<ActUser/>}/>
+                <Route path='users/detail/:id' element={<ActUser/>}/>
               </Route>
           </Routes>
         </div>

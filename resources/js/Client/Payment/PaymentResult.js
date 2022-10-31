@@ -9,7 +9,16 @@ const PaymentResult = () => {
   const [result, setResult] = useState([]);
     useEffect(() => {
         let values = getParams();
-        getResultPayment(values).then((res) => {
+        var method = "";
+        if(values[0].value != null) {
+          if(values[0].value.search("MOMO")> -1) {
+          
+            method = "momo";
+          }
+        }else {
+          method = "vnpay";
+        }
+        getResultPayment({method, values}).then((res) => {
           setResult(res.data);
         })
         
@@ -21,9 +30,11 @@ const PaymentResult = () => {
     if(result.RspCode == '00')  {
       title = "Thanh toán thành công!"
       type = "success";
+      message = `Đơn hàng ${result.OrderID} đã được thanh toán, mail và tin nhắn sẽ được gửi đến quý khách trong vài phút tới!`;
     }
     else if(result.RspCode == '02' || result.RspCode == '99'){
       title = "Thanh toán không thành công!",
+      message = `Đơn hàng ${result.OrderID} thanh toán không thành công`;
       type = "error";
     }
     return (
@@ -34,9 +45,11 @@ const PaymentResult = () => {
               subTitle= {message}
               extra={[
               <Button type="primary" key="console">
-                  Quay về trang chủ
+                  <Link to="/">Quay về trang chủ</Link>
               </Button>,
-              <Button key="buy">Đặt vé khác</Button>,
+              <Button key="buy">
+                <Link to="/ticket">Đặt vé khác</Link>
+              </Button>,
               ]}
           />
       </Card>

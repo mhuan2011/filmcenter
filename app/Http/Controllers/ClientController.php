@@ -4,12 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\CinemaHall;
 use App\Models\Movies;
+use App\Models\Reservation;
 use App\Models\Show;
+use App\Models\ShowSeat;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+
+use function PHPUnit\Framework\isEmpty;
 
 class ClientController extends Controller
 {
@@ -192,6 +196,87 @@ class ClientController extends Controller
                 "cinema" => $cinema_count[0]->cinema,
                 "users" => $users[0]->users,
             ],
+        ]);
+    }
+
+    public function revenueByDate(Request $request)
+    {
+        $data = $request->all();
+        $time_start = $data['time_start'];
+        $time_end =   $data['time_end'];
+        // $cinema_id =   $data['cinema_id'];
+        $amount = DB::select("SELECT SUM(amount) AS amount, DATE(p.created_at) as created_at FROM payment as p, reservation as r WHERE p.created_at>'{$time_start}' AND p.created_at<'{$time_end}' AND  p.reservation_id = r.id AND r.status = N'Thanh toán' GROUP BY DATE(p.created_at)");
+
+        // if ($cinema_id == 0) {
+        // } else {
+        // }
+        return response()->json([
+            'status' => true,
+            'data' => $amount
+        ]);
+    }
+
+
+    public function cinemaHallOfCinema()
+    {
+
+        $cinema_hall = DB::select("SELECT COUNT(cinema_hall.id) as number_cinema_hall, cinema.name FROM cinema_hall, cinema WHERE cinema_hall.cinema_id = cinema.id GROUP BY cinema.id, cinema.name");
+        return response()->json([
+            'status' => true,
+            'data' => $cinema_hall
+        ]);
+    }
+
+    public function getInforReservation($order_id)
+    {
+        $reservation = Reservation::where('reservation.id', $order_id);
+
+        $check = Reservation::where('id', $order_id)->first();
+        if (!$check) {
+            return response()->json([
+                'status' => false,
+                'data' => [],
+                'message' => "Không tìm thấy mã đặt vé!!!"
+            ]);
+        }
+
+        if ($reservation) {
+            // $seat = $reservation->leftJoin('show_seat', 'show_seat.reservation_id', '=', 'reservation.id')
+            //     ->get();
+
+            $seat = DB::select("SELECT *  FROM show_seat as ss, reservation as r, seat as s WHERE r.id = " . $order_id . " AND ss.seat_id = s.id AND r.id = ss.reservation_id");
+
+            $show_id = ShowSeat::where('reservation_id', $order_id)->get('show_id')->first()['show_id'];
+
+            $show_infor = Show::selectRaw('show.start_time, show.date, cinema.name as cinema_name, cinema.address as cinema_address, movies.title as movies_title, cinema_hall.name as screen')
+                ->where('show.id', $show_id)
+                ->leftJoin('cinema_hall', 'cinema_hall.id', '=', 'show.cinema_hall_id')
+                ->leftJoin('cinema', 'cinema.id', '=', 'cinema_hall.cinema_id')
+                ->leftJoin('movies', 'movies.id', '=', 'show.movie_id')->get();
+
+            $user =  Reservation::selectRaw('users.name, users.email, users.phone')
+                ->where('reservation.id', $order_id)
+                ->leftJoin('users', 'users.id', '=', 'reservation.user_id')->get();
+
+
+            $data = [
+                'seat' => $seat,
+                'show_infor' => $show_infor,
+                'user' => $user,
+                'order_id' => $order_id,
+                'reservation' => $check
+            ];
+
+            return response()->json([
+                'status' => true,
+                'data' => $data,
+                'message' => "Tìm thấy thông tin đặt vé!!!"
+            ]);
+        }
+        return response()->json([
+            'status' => false,
+            'data' => [],
+            'message' => "Không tìm thấy mã đặt vé!!!"
         ]);
     }
 }

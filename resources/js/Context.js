@@ -176,6 +176,11 @@ const Provider = ({ children }) => {
       return axios.get('/api/movies/delete/{id}', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
 
+    filterMovies: (values) => {
+      return axios.post(`/api/movies/filter`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+
     // Cinemal hall
     getCinemalHall: (keyID) => {
       return axios.get(`/api/cinema-hall/getitem/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
@@ -252,7 +257,9 @@ const Provider = ({ children }) => {
       return axios.post(`/api/getmovies-cinema-date`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
 
-
+    getInforReservation: (keyID) => {
+      return axios.get(`/api/get-infor-with-order/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
 
     getShowWithCinemaMovies: (values) => {
       return axios.post(`/api/getshow`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
@@ -288,9 +295,37 @@ const Provider = ({ children }) => {
       return axios.post(`/api/user/update`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
 
+    updateAccount: (values) => {
+      return axios.post(`/api/user/update-account`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+
+    createAccount: (values) => {
+      return axios.post(`/api/user/create`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    detailAccount: (values) => {
+      return axios.post(`/api/user/detail`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+
+
+    // cms user
+    getListUser: () => {
+      return axios.get(`/api/user/getlist`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
     //dashboard
     statisticByDate: (values) => {
       return axios.post('/api/statistic-by-date', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    revenueByDate: (values) => {
+      return axios.post('/api/revenue-by-date', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    cinemaHallOfCinema: () => {
+      return axios.get('/api/cinemahall-of-cinema', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
 
     getParams: () => {

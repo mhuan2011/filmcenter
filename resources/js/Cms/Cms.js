@@ -22,10 +22,6 @@ const dropDownItem = [
   },
   {
     key: '3',
-    label: <Link to='/my-order'>Thông tin đơn hàng</Link>,
-  },
-  {
-    key: '4',
     label: <Link to='/logout'>Đăng xuất</Link>,
   },
 ]
@@ -54,7 +50,7 @@ const Cms = () => {
           <Menu.Item key="0" icon={<DesktopOutlined />}>
             <Link to="/admin">CMS</Link>
           </Menu.Item>
-          {user.role_id < 3 ? <SubMenu
+          {(user.role_id == 1 || user.role_id == 2) ? <SubMenu
             key="menus"
             icon={<ProfileOutlined />}
             title="Quản lý phim"
@@ -79,9 +75,12 @@ const Cms = () => {
             <Menu.Item key="sub1-1">
               <Link to="/admin/show">Lịch chiếu</Link>
             </Menu.Item>
+            <Menu.Item key="sub1-2">
+              <Link to="/admin/scan">Quét mã</Link>
+            </Menu.Item>
           </SubMenu>
 
-          {user.role_id === 1 ? <SubMenu
+          {user.role_id == 1 || user.role_id == 2 ? <SubMenu
             key="cinema-hall"
             icon={<ProfileOutlined />}
             title="Quản lý rạp"
@@ -96,7 +95,7 @@ const Cms = () => {
            
           </SubMenu> : null}
 
-          {user.role_id < 3 ? <Menu.Item key="7" icon={<UserOutlined />}>
+          {user.role_id == 2 ? <Menu.Item key="7" icon={<UserOutlined />}>
             <Link to="/admin/users">Quản lý tài khoản</Link>
           </Menu.Item> : null}
           
@@ -104,7 +103,7 @@ const Cms = () => {
       </Sider>
       <Layout>
         <Header style={{ background: '#fff' }} >
-          Chi nhánh: {storeName} {user.role_id==1?"Tất cả các rạp":""}
+          Chi nhánh: {storeName} {(user.role_id==1 || user.role_id==2)?"Tất cả các rạp":""}
           <div className="login">
             <>
               <Avatar icon={<UserOutlined />} />

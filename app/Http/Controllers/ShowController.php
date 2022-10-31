@@ -13,7 +13,8 @@ class ShowController extends Controller
     //
     public function getlist()
     {
-        $data = Show::orderBy('id', 'DESC')->with('movies')->with('cinema_hall')->get();
+        $data = Show::orderBy('id', 'DESC')->with('movies')->with('cinema_hall')
+            ->get();
         return response()->json([
             'status' => true,
             'data' => $data,
@@ -22,7 +23,12 @@ class ShowController extends Controller
 
     public function getlistTicket($id)
     {
-        $data = ShowSeat::where('show_id', $id)->with('seat')->get();
+        $data = ShowSeat::selectRaw("show_seat.id, show_seat.status, seat.row, seat.number, users.id as user_id, users.name as username, reservation.id as reservation_id")->where('show_id', $id)
+            ->leftJoin("seat", "seat.id", "=", "show_seat.seat_id")
+            ->leftJoin("reservation", "reservation.id", "=", "show_seat.reservation_id")
+            ->leftJoin("users", "users.id", "=", "reservation.user_id")
+
+            ->orderBy('show_seat.id', 'ASC')->get();
         return response()->json([
             'status' => true,
             'data' => $data,

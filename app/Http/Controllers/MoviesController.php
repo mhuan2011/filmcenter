@@ -18,6 +18,39 @@ class MoviesController extends Controller
             'data' => $data,
         ]);
     }
+
+    public function filtermovies(Request $request)
+    {
+        $data = $request->all();
+        if ($data == []) {
+            $result = Movies::orderBy('id', 'DESC')->with('category')->get();
+        } else {
+            $result = [];
+
+            if ($request->title) {
+                $result = Movies::where('title', 'like', '%' . $data['title'] . '%');
+            } else {
+                $result = Movies::selectRaw("*");
+            }
+
+            if ($request->country) {
+                $result = $result->where("country_id", $data['country']);
+            }
+
+            if ($request->category) {
+                $result = $result->where("category_id", $data['category']);
+            }
+
+            $result =  $result->get();
+        }
+        return response()->json([
+            'status' => true,
+            'data' => $result,
+        ]);
+    }
+
+
+
     public function getitem($id)
     {
         $item = Movies::where("id", $id)->with('category')->first();

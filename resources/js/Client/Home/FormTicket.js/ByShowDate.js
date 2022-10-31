@@ -10,7 +10,7 @@ const {Option} = Select;
 
 const ByShowDate = () => {
   let navigate = useNavigate();
-  const { getShowDate, getMoviesWithCinemaAndDate , getShowWithCinemaMovies } = useContext(AppContext);
+  const { user, getShowDate, getMoviesWithCinemaAndDate , getShowWithCinemaMovies } = useContext(AppContext);
   const [show, setShow] = useState([]);
   const [dateShow, setDateShow] = useState([]);
   const [cinema, setCinema] = useState([]);
@@ -66,25 +66,34 @@ const ByShowDate = () => {
   }
 
   const buyTicket = () => {
-    if(!movieID) {
-      helper.notification({status: "warning", message: "Vui lòng chọn phim!!!"})
-    }else {
-      if(!cinemaID) {
-        helper.notification({status: "warning", message: "Vui lòng chọn rạp!!!"})
-      }
-      else {
-        if(!date) {
-          helper.notification({status: "warning", message: "Vui lòng ngày!!!"})
-        }else {
-          if(!showID) {
-            helper.notification({status: "warning", message: "Vui lòng suất chiếu!!!"})
+    
+      if(!movieID) {
+        helper.notification({status: "warning", message: "Vui lòng chọn phim!!!"})
+      }else {
+        if(!cinemaID) {
+          helper.notification({status: "warning", message: "Vui lòng chọn rạp!!!"})
+        }
+        else {
+          if(!date) {
+            helper.notification({status: "warning", message: "Vui lòng ngày!!!"})
           }else {
-            navigate(`/book-ticket?movieId=${movieID}&cinemaId=${cinemaID}&showId=${showID}`);
+            if(!showID) {
+              helper.notification({status: "warning", message: "Vui lòng suất chiếu!!!"})
+            }else {
+              if(user.role_id != "") {
+                navigate(`/book-ticket?movieId=${movieID}&cinemaId=${cinemaID}&showId=${showID}`);
+              }else {
+                helper.notification({status: "warning", message: "Vui lòng đăng nhập để mua vé!!!"})
+              }
+             
+            }
           }
         }
+        
       }
-    }
-
+    
+      
+    
      
   }
 
