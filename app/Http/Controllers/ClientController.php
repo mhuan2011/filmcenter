@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NotificationReservation;
 use App\Models\CinemaHall;
 use App\Models\Movies;
+use App\Models\Payment;
 use App\Models\Reservation;
 use App\Models\Show;
 use App\Models\ShowSeat;
 use App\Models\User;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +22,7 @@ class ClientController extends Controller
 {
     public function getMovieShow()
     {
+
         $date = Carbon::now('Asia/Ho_Chi_Minh')->format('Y-m-d');
         $time = Carbon::now('Asia/Ho_Chi_Minh')->format('H:i:s');
 
@@ -116,6 +120,10 @@ class ClientController extends Controller
             'status' => true,
             'data' => $data,
         ]);
+    }
+
+    public function getShowWithMovieId(Request $request)
+    {
     }
 
     public function getMoviesWithCinemAndDate(Request $request)
@@ -248,7 +256,7 @@ class ClientController extends Controller
 
             $show_id = ShowSeat::where('reservation_id', $order_id)->get('show_id')->first()['show_id'];
 
-            $show_infor = Show::selectRaw('show.start_time, show.date, cinema.name as cinema_name, cinema.address as cinema_address, movies.title as movies_title, cinema_hall.name as screen')
+            $show_infor = Show::selectRaw('show.id, movies.id as movie_id, show.price, cinema.id as cinema_id, show.start_time, show.date, cinema.name as cinema_name, cinema.address as cinema_address, movies.title as movies_title, cinema_hall.name as screen')
                 ->where('show.id', $show_id)
                 ->leftJoin('cinema_hall', 'cinema_hall.id', '=', 'show.cinema_hall_id')
                 ->leftJoin('cinema', 'cinema.id', '=', 'cinema_hall.cinema_id')
@@ -278,5 +286,85 @@ class ClientController extends Controller
             'data' => [],
             'message' => "Không tìm thấy mã đặt vé!!!"
         ]);
+    }
+
+    public function getReserverionOfUser($id)
+    {
+        $user_id = isset($id) ? $id : null;
+        if ($user_id) {
+            $result = Reservation::where("user_id", $user_id)->with(['seat'])->orderBy('id', 'desc')->get();
+            return response()->json([
+                'status' => true,
+                'data' => $result
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => "user not found!"
+            ]);
+        }
+    }
+
+    public function     tranferTicket(Request $request)
+    {
+        $data = $request->all();
+        try {
+            // user_id = $data['user_id'];
+            $seats = $data['reserveSeat'];
+            $reservation_id = $data['reservation_id'];
+            $is_pay = isset($data['is_pay']) ? $data['is_pay'] : false;
+            $now = Carbon::now();
+            $unique_code = Carbon::now()->timestamp;
+
+            $c = false;
+            foreach ($seats as $seat) {
+                $check = ShowSeat::where('id', $seat)->first();
+                if ($check->status == 1) {
+                    $c = true;
+                }
+            }
+            if ($c == true) {
+                return response()->json([
+                    'status' => false,
+                    'message' => "Bạn chậm mất rồi! ghế bạn chọn đã được đặt, bạn vui lòng chọn ghế khác!"
+                ]);
+            }
+
+            //check payment
+            $payment = Payment::where("reservation_id", $reservation_id)->first();
+            if ($payment) {
+                return response()->json([
+                    'status' => false,
+                    'message' => "Vé đã thanh toán không thể đổi !!!"
+                ]);
+            }
+
+            // check reservation
+            $reservation = Reservation::find($reservation_id);
+            if ($reservation) {
+                // removw old seat
+                $show_seat_old = ShowSeat::where("reservation_id", $reservation_id)->get();
+                if ($show_seat_old) {
+                    foreach ($show_seat_old as $seat) {
+                        $seat->reservation_id = "";
+                        $seat->status = 0;
+                        $seat->save();
+                    }
+                }
+
+                foreach ($seats as $seat) {
+                    $res = ShowSeat::where('id', $seat)->update(['reservation_id' => $reservation_id, 'status' => 1]);
+                }
+            }
+            return response()->json([
+                'status' => true,
+                'message' => "Đổi vé thành công !!!",
+            ]);
+        } catch (Exception $err) {
+            return response()->json([
+                'status' => false,
+                'message' => "Error! " . $err
+            ]);
+        }
     }
 }

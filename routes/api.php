@@ -7,12 +7,16 @@ use App\Http\Controllers\CinemaHallController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\MoviesController;
+use App\Http\Controllers\NotiController;
 use App\Http\Controllers\PaymenController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ShowController;
 use App\Http\Controllers\StarController;
 use App\Http\Controllers\UserController;
+use Facade\FlareClient\Http\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -35,25 +39,91 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::post('/user/update', [AuthController::class, 'update'])->middleware('auth:sanctum');
-Route::post('/user/create', [UserController::class, 'creatAccount'])->middleware('auth:sanctum');
-Route::post('/user/detail', [UserController::class, 'getAccountDetail'])->middleware('auth:sanctum');
-Route::post('/user/update-account', [UserController::class, 'updateAccount'])->middleware('auth:sanctum');
 
-//Categories
-Route::get('/category/getlist', [CategoriesController::class, 'getlist']);
-Route::get('/category/getfilter', [CategoriesController::class, 'getfilter'])->middleware('auth:sanctum');
-Route::get('/category/getitem/{id}', [CategoriesController::class, 'getitem'])->middleware('auth:sanctum');
-Route::post('/category/store', [CategoriesController::class, 'store'])->middleware('auth:sanctum');
-Route::post('/category/update/{id}', [CategoriesController::class, 'update'])->middleware('auth:sanctum');
-Route::get('/category/delete/{id}', [CategoriesController::class, 'delete'])->middleware('auth:sanctum');
+Route::group(['middleware' => ['auth:api', 'role:admin|staff'], 'prefix' => 'category'], function () {
+    //Categories
+    Route::get('/getlist', [CategoriesController::class, 'getlist'])->name("category.getlist");
+    Route::get('/getfilter', [CategoriesController::class, 'getfilter']);
+    Route::get('/getitem/{id}', [CategoriesController::class, 'getitem']);
+    Route::post('/store', [CategoriesController::class, 'store']);
+    Route::post('/update/{id}', [CategoriesController::class, 'update']);
+    Route::get('/delete/{id}', [CategoriesController::class, 'delete']);
+});
+
+
+Route::group(['middleware' => ['auth:api', 'role:admin|staff'], 'prefix' => 'user'], function () {
+    Route::post('/update', [AuthController::class, 'update']);
+    Route::post('/create', [UserController::class, 'creatAccount']);
+    Route::post('/detail', [UserController::class, 'getAccountDetail']);
+    Route::post('/update-account', [UserController::class, 'updateAccount']);
+});
+
+
+
+Route::group(['middleware' => ['auth:api', 'role:admin|staff']], function () {
+    Route::group(['prefix' => 'person'], function () {
+        Route::get('/getlist', [PersonController::class, 'getlist']);
+        Route::get('/getitem/{id}', [PersonController::class, 'getitem']);
+        Route::post('/store', [PersonController::class, 'store']);
+        Route::post('/update', [PersonController::class, 'update']);
+        Route::get('/delete/{id}', [PersonController::class, 'delete']);
+    });
+
+    Route::group(['prefix' => 'movies'], function () {
+        Route::post('/store', [MoviesController::class, 'store']);
+        Route::post('/update', [MoviesController::class, 'update']);
+        Route::get('/delete/{id}', [MoviesController::class, 'delete']);
+    });
+
+    Route::group(['prefix' => 'cinema-hall'], function () {
+
+        Route::get('/getitem/{id}', [CinemaHallController::class, 'getitem']);
+        Route::post('/store', [CinemaHallController::class, 'store']);
+        Route::post('/update', [CinemaHallController::class, 'update']);
+        Route::get('/delete/{id}', [CinemaHallController::class, 'delete']);
+    });
+
+    Route::group(['prefix' => 'cinema'], function () {
+        Route::get('/getlist', [CinemaController::class, 'getlist']);
+        Route::get('/getitem/{id}', [CinemaController::class, 'getitem']);
+        Route::post('/store', [CinemaController::class, 'store']);
+        Route::post('/update', [CinemaController::class, 'update']);
+        Route::get('/delete/{id}', [CinemaController::class, 'delete']);
+    });
+
+    Route::group(['prefix' => 'show'], function () {
+        Route::get('/getlist', [ShowController::class, 'getlist']);
+        Route::post('/getlist/ticket', [ShowController::class, 'getlistTicket']);
+
+        Route::get('/getitem/{id}', [ShowController::class, 'getitem']);
+        Route::post('/store', [ShowController::class, 'store']);
+        Route::post('/update', [ShowController::class, 'update']);
+        Route::get('/delete/{id}', [ShowController::class, 'delete']);
+    });
+});
+
+
+
+Route::group(['middleware' => ['auth:api', 'role:admin|staff']], function () {
+    Route::get('/user/getlist', [UserController::class, 'getlist']);
+    Route::post('/user/get-role', [UserController::class, 'getRoleOfUser']);
+    Route::post('/user/update-roles-user', [UserController::class, 'updateRoleForUser']);
+    //role
+    Route::get('/role/getlist', [RoleController::class, 'getlist']);
+    Route::post('/role/store', [RoleController::class, 'store']);
+    Route::get('/role/getitem/{id}', [RoleController::class, 'getitem']);
+    Route::post('/role/update', [RoleController::class, 'update']);
+    Route::post('/role/add-permission-roles', [RoleController::class, 'addPermissonToRole']);
+    Route::post('/role/get-permission', [RoleController::class, 'getPermissionOfRole']);
+    //permission
+    Route::get('/permission/getlist', [PermissionController::class, 'getlist']);
+    Route::post('/permission/store', [PermissionController::class, 'store']);
+    Route::get('/permission/getitem/{id}', [PermissionController::class, 'getitem']);
+    Route::post('/permission/update', [PermissionController::class, 'update']);
+});
 
 //Person
-Route::get('/person/getlist', [PersonController::class, 'getlist'])->middleware('auth:sanctum');
-Route::get('/person/getitem/{id}', [PersonController::class, 'getitem'])->middleware('auth:sanctum');
-Route::post('/person/store', [PersonController::class, 'store'])->middleware('auth:sanctum');
-Route::post('/person/update', [PersonController::class, 'update'])->middleware('auth:sanctum');
-Route::get('/person/delete/{id}', [PersonController::class, 'delete'])->middleware('auth:sanctum');
+
 
 //Country
 Route::get('/country/getlist', [CountryController::class, 'getlist']);
@@ -61,36 +131,8 @@ Route::get('/country/getlist', [CountryController::class, 'getlist']);
 //Movies
 Route::get('/movies/getlist', [MoviesController::class, 'getlist']);
 Route::get('/movies/getitem/{id}', [MoviesController::class, 'getitem']);
-Route::post('/movies/store', [MoviesController::class, 'store'])->middleware('auth:sanctum');
-Route::post('/movies/update', [MoviesController::class, 'update'])->middleware('auth:sanctum');
-Route::get('/movies/delete/{id}', [MoviesController::class, 'delete'])->middleware('auth:sanctum');
 Route::post('/movies/filter', [MoviesController::class, 'filtermovies']);
 
-//Cinema Hall
-
-Route::get('/cinema-hall/getlist', [CinemaHallController::class, 'getlist'])->middleware('auth:sanctum');
-Route::get('/cinema-hall/getitem/{id}', [CinemaHallController::class, 'getitem'])->middleware('auth:sanctum');
-Route::post('/cinema-hall/store', [CinemaHallController::class, 'store'])->middleware('auth:sanctum');
-Route::post('/cinema-hall/update', [CinemaHallController::class, 'update'])->middleware('auth:sanctum');
-Route::get('/cinema-hall/delete/{id}', [CinemaHallController::class, 'delete'])->middleware('auth:sanctum');
-
-//Cinema
-
-Route::get('/cinema/getlist', [CinemaController::class, 'getlist'])->middleware('auth:sanctum');
-Route::get('/cinema/getitem/{id}', [CinemaController::class, 'getitem'])->middleware('auth:sanctum');
-Route::post('/cinema/store', [CinemaController::class, 'store'])->middleware('auth:sanctum');
-Route::post('/cinema/update', [CinemaController::class, 'update'])->middleware('auth:sanctum');
-Route::get('/cinema/delete/{id}', [CinemaController::class, 'delete'])->middleware('auth:sanctum');
-
-
-//Show
-Route::get('/show/getlist', [ShowController::class, 'getlist'])->middleware('auth:sanctum');
-Route::get('/show/getlist/ticket/{id}', [ShowController::class, 'getlistTicket'])->middleware('auth:sanctum');
-Route::post('/show/getseatmap', [ShowController::class, 'getSeatMap'])->middleware('auth:sanctum');
-Route::get('/show/getitem/{id}', [ShowController::class, 'getitem'])->middleware('auth:sanctum');
-Route::post('/show/store', [ShowController::class, 'store'])->middleware('auth:sanctum');
-Route::post('/show/update', [ShowController::class, 'update'])->middleware('auth:sanctum');
-Route::get('/show/delete/{id}', [ShowController::class, 'delete'])->middleware('auth:sanctum');
 
 //Client
 Route::get('/getmovies-show', [ClientController::class, 'getMovieShow']);
@@ -118,8 +160,16 @@ Route::post('/get-actors', [StarController::class, 'getActors']);
 
 //Dashboard
 Route::post('/statistic-by-date', [ClientController::class, 'statistic'])->middleware('auth:sanctum');
-
 Route::post('/revenue-by-date', [ClientController::class, 'revenueByDate'])->middleware('auth:sanctum');
 Route::get('/cinemahall-of-cinema', [ClientController::class, 'cinemaHallOfCinema'])->middleware('auth:sanctum');
-// user 
-Route::get('/user/getlist', [UserController::class, 'getlist'])->middleware('auth:sanctum');
+
+Route::get('/reservation-history/{id}', [ClientController::class, 'getReserverionOfUser'])->middleware('auth:sanctum');
+
+Route::post('/cancle-reservation', [ReservationController::class, 'cancleReservation'])->middleware('auth:sanctum');
+Route::post('/tranfer-ticket', [ClientController::class, 'tranferTicket'])->middleware('auth:sanctum');
+
+
+Route::get('/noti', [NotiController::class, 'index']);
+
+Route::post('/show/getseatmap', [ShowController::class, 'getSeatMap']);
+Route::get('/cinema-hall/getlist', [CinemaHallController::class, 'getlist']);

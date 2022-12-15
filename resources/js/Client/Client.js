@@ -5,22 +5,36 @@ import { UserOutlined, DownOutlined, ShoppingCartOutlined, MailOutlined, Appstor
 import { AppContext } from '../Context.js';
 import Home from './Home.js';
 import logo from '../../images/logo.png'
+import Pusher from 'pusher-js';
 
 const { Header, Content, Footer } = Layout;
 
 const Client = () => {
   const { user } = useContext(AppContext);
-  
+
   const [selected, setSelected] = useState('');
   useEffect(() => {
     var path = window.location.pathname;
-    if(path != null && path != "") {
+    if (path != null && path != "") {
       setSelected(path.substring(1, path.length));
     } else {
       setSelected('home')
     };
-    
-  },[])
+
+  }, [])
+
+  useEffect(() => {
+    Pusher.logToConsole = true;
+    var pusher = new Pusher(process.env.MIX_PUSHER_APP_KEY, {
+      cluster: process.env.MIX_PUSHER_APP_CLUSTER
+    });
+
+    var channel = pusher.subscribe('status-liked');
+    channel.bind('huan-event', function (data) {
+      alert(JSON.stringify(data));
+    });
+
+  }, [])
 
   const menuItems = [
     {
@@ -39,6 +53,10 @@ const Client = () => {
       key: 'about-us',
       label: <Link to='/about-us'>Giới thiệu</Link>,
     },
+    user ? {
+      key: 'history',
+      label: <Link to='/history'>Lịch sử</Link>,
+    } : {}
 
   ];
 
@@ -52,13 +70,10 @@ const Client = () => {
       key: '2',
       label: <Link to='/history'>Lịch sử đặt vé</Link>,
     },
-    {
-      key: '3',
-      label: <Link to='/logout'>Đăng xuất</Link>,
-    },
+
   ]
-  const menu =() => {
-    if((user.role_id == 1 || user.role_id == 2) && dropDownItem.length == 3) {
+  const menu = () => {
+    if ((user.role_id == 1 || user.role_id == 2) && dropDownItem.length == 2) {
       dropDownItem.push(
         {
           key: '4',
@@ -66,6 +81,13 @@ const Client = () => {
         },
       )
     }
+
+    dropDownItem.push(
+      {
+        key: '3',
+        label: <Link to='/logout'>Đăng xuất</Link>,
+      },
+    );
     return (
       <Menu items={dropDownItem} >
       </Menu>
@@ -96,47 +118,47 @@ const Client = () => {
       />
     )
   }
-  
+
   return (
     <>
       <Layout className="layout" style={{ minHeight: '100vh' }}>
         <Header style={{ position: 'fixed', zIndex: 100, width: '100%', background: 'rgba(250,250,250,1)' }}>
           <div className='header-container'>
             <div className="logo">
-                {/* <Link to='/'><img src={logo} alt=""/></Link> */}
-                <Link to='/'><div className="text-logo">Fimcenter</div></Link>
+              {/* <Link to='/'><img src={logo} alt=""/></Link> */}
+              <Link to='/'><div className="text-logo">Fimcenter</div></Link>
             </div>
             <div className='nav-bar'>
-              <Menu 
-                      onClick={onClick} 
-                      items={menuItems} 
-                      mode="horizontal"   
-                      selectedKeys={selected} 
-                      overflowedIndicator ={<MenuOutlined/>}
-                      className="menu"
+              <Menu
+                onClick={onClick}
+                items={menuItems}
+                mode="horizontal"
+                selectedKeys={selected}
+                overflowedIndicator={<MenuOutlined />}
+              // className="menu"
               />
-                {!user.id
-                        ? <Button type='primary'><Link to='/login'>Đăng nhập</Link></Button>
-                        : <>
-                          {user.name}
-                          <Dropdown overlay={menu} trigger={['click']}>
-                            <Avatar style={{marginLeft: '4px'}} icon={<UserOutlined />} /> 
-                          </Dropdown>
-                          <Popover placement="bottomRight" title={"Thông báo"} content={notice} trigger="click" style={{width: 300}}>
-                             <Badge  count={1}>
-                              <Avatar style={{marginLeft: '10px'}} icon={<BellOutlined />} />
-                            </Badge>
-                          </Popover>
-                      </>}
+              {!user.id
+                ? <Button type='primary'><Link to='/login'>Đăng nhập</Link></Button>
+                : <>
+                  {user.name}
+                  <Dropdown overlay={menu} trigger={['click']}>
+                    <Avatar style={{ marginLeft: '4px' }} icon={<UserOutlined />} />
+                  </Dropdown>
+                  <Popover placement="bottomRight" title={"Thông báo"} content={notice} trigger="click" style={{ width: 300 }}>
+                    <Badge count={1}>
+                      <Avatar style={{ marginLeft: '10px' }} icon={<BellOutlined />} />
+                    </Badge>
+                  </Popover>
+                </>}
             </div>
           </div>
         </Header>
 
         <Content style={{ marginTop: '63px' }}>
-          <Outlet />  
+          <Outlet />
         </Content>
 
-        <Footer style={{ textAlign: 'center', zIndex: 10 }}>FILM CENTER</Footer>
+        <Footer style={{ textAlign: 'center', zIndex: 10 }}> 2022 - Film center - Developed by Huan Nguyen</Footer>
 
       </Layout>
     </>

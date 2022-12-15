@@ -2,26 +2,28 @@ import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button, Image, Popconfirm, Space, Table, Tag } from 'antd';
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { openNotification } from '../../Client/Helper/Notification'; 
-import { AppContext } from '../../Context'; 
+import { openNotification } from '../../Client/Helper/Notification';
+import { AppContext } from '../../Context';
 import ActCategory from './ActCateogry';
 
 const MoviesCategory = () => {
   let navigate = useNavigate();
-  const {getListCategory, deleteCategory } = useContext(AppContext);
+  const { getListCategory, deleteCategory } = useContext(AppContext);
   const [data, setData] = useState();
   const [loadingTable, setLoadingTable] = useState(true);
   const [visible, setvisible] = useState(false);
   const [refresh, setRefresh] = useState(null);
   const [keyID, setKeyID] = useState(null);
-  
+
 
   useEffect(() => {
     getListCategory().then((response) => {
       setData(response.data.data);
       setLoadingTable(false)
+    }).catch((err) => {
+      openNotification({ status: false, message: err.response.data.message });
+      setLoadingTable(false)
     })
-    
   }, [refresh])
   const columns = [
     {
@@ -40,7 +42,7 @@ const MoviesCategory = () => {
       dataIndex: 'description',
       key: 'description',
     },
-    
+
     {
       title: 'Action',
       key: 'action',
@@ -63,15 +65,20 @@ const MoviesCategory = () => {
   const remove = (record) => {
     setLoadingTable(true)
     deleteCategory(record.id).then((res) => {
-      let newItems = data.filter(item => item.id !== record.id)
-      setData(newItems)
-      openNotification(res.data);
+      if (res.data.status) {
+        let newItems = data.filter(item => item.id !== record.id)
+        setData(newItems)
+        setRefresh(new Date());
+        openNotification(res.data);
+      } else {
+        openNotification({ status: false, data: res.data.message });
+      }
       setLoadingTable(false)
     })
   }
-  const openDraw = () =>{
+  const openDraw = () => {
     setvisible(true);
-}
+  }
   return (
     <>
       <Breadcrumb style={{ margin: '16px 0' }}>
@@ -89,8 +96,8 @@ const MoviesCategory = () => {
           loading={loadingTable}
         />
       </div>
-      <ActCategory visible={visible} setDraw={setvisible} keyID={keyID} refresh={setRefresh} setKey={setKeyID}/>
-      
+      <ActCategory visible={visible} setDraw={setvisible} keyID={keyID} refresh={setRefresh} setKey={setKeyID} />
+
     </>
   )
 }

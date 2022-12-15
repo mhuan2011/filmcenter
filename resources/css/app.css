@@ -7,6 +7,11 @@
 	background: #ff5db4;
 	color: #fff;
 }
+
+/* footer*/
+.ant-layout-footer {
+	padding: 10px;
+}
 /* home */
 .slider-review {
 	position: relative;
@@ -184,6 +189,20 @@
     padding-bottom: 14px;
 }
 
+.ant-layout-header {
+	padding-left: 14px;
+}
+
+.ant-menu {
+	height: 100%;
+}
+.menu {
+	min-width: unset;
+}
+
+.nav-bar .ant-menu {
+	width: 500px
+}
 /* end box sticky */
 @media only screen and (max-width: 720px) {
     .preview-video {
@@ -191,10 +210,15 @@
         width: 300px;
         height: 200px;
     }
-    /* .menu {
-        width: 200px;
-    } */
+ 
+	.ant-menu {
+		height: 100%;
+		
+	}
 
+	.nav-bar .ant-menu {
+		width: 50px;
+	}
 	.box-buy-ticket {
 		right: 0;
     	top: 20%;
@@ -596,4 +620,19 @@ background: url('https://www.kinomeister.de/wp-content/uploads/2020/08/sith4.jpg
 .cardWrap .barcode svg {
 	transform: scale(0.45) !important;
 	transform-origin: top left;
+}
+
+.logo-admin {
+	text-align: center;
+	padding: 5px 0;
+	margin: 10px;
+	border: 2px solid #2196f3;
+	background: #fff;
+	color: #2196f3;
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.model-custom {
+	width: 1300px !important;
 }

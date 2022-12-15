@@ -14,7 +14,6 @@ const CinemaHall = () => {
   useEffect(() => {
     getFilterCategory().then((res) => {
       setCategories(res.data.data);
-      console.log(res.data.data)
     });
     getListCinemalHall ().then((res) => {
       setData(res.data.data);

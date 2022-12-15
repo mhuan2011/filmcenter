@@ -9,4 +9,14 @@ class Reservation extends Model
 {
     use HasFactory;
     protected $table = 'reservation';
+
+    public function seat()
+    {
+        return $this->hasMany(ShowSeat::class);
+    }
+
+    public function show()
+    {
+        $show = $this->hasMany(ShowSeat::class);
+    }
 }

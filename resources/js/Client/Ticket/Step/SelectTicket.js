@@ -4,21 +4,25 @@ import React, { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../../../Context.js';
 import helper from '../../Helper/helper.js';
 
-const SelectTicket = ({ticketInfor, setTicketInfor, setTotal}) => {
+const SelectTicket = ({ ticketInfor, setTicketInfor, setTotal, price }) => {
   const [dataSource, setDataSource] = useState([]);
-  
-  
+
+
   useEffect(() => {
     setDataSource(data);
-  },[])
 
+  }, [])
+
+  useEffect(() => {
+    setDataSource(data);
+  }, [price])
 
   var data = [
     {
       type_id: 1,
       ticket_type: 'Nguoi Lon',
       quantity: 0,
-      price: 50000,
+      price: price,
       total: 0,
       description: 'Vé 2D'
     },
@@ -26,7 +30,7 @@ const SelectTicket = ({ticketInfor, setTicketInfor, setTotal}) => {
       type_id: 2,
       ticket_type: 'Ve 2D Thanh Vien',
       quantity: 0,
-      price: 50000,
+      price: price,
       total: 0,
       description: 'Vé 2D-Chỉ áp dụng khách hàng thành viên'
     },
@@ -38,7 +42,7 @@ const SelectTicket = ({ticketInfor, setTicketInfor, setTotal}) => {
 
     dataSource.forEach(ele => {
       totalPrice += ele.quantity * ele.price;
-      if(ele.quantity > 0) {
+      if (ele.quantity > 0) {
         ticketType.push(ele);
       }
     });
@@ -49,67 +53,68 @@ const SelectTicket = ({ticketInfor, setTicketInfor, setTotal}) => {
   }
 
   const columns = [
-      {
-        title: 'Loại vé',
-        dataIndex: 'ticket_type',
-        key: 'ticket_type',
-        render: (_,record) => 
+    {
+      title: 'Loại vé',
+      dataIndex: 'ticket_type',
+      key: 'ticket_type',
+      render: (_, record) =>
+        <>
+          <Meta
+            title={record.ticket_type}
+            description={record.description}
+          />
+        </>
+      ,
+    },
+    {
+      title: 'Số lượng',
+      dataIndex: 'quantity',
+      key: 'quantity',
+      render: (text, record, index) => {
+        const onChangeQuantity = (e) => {
+          if (e != null) {
+            record.quantity = e;
+            setDataSource(
+              dataSource.map((row, i) =>
+                i === index ? { ...record, total: record.quantity * record.price } : row
+              )
+            );
+          }
+          updateData();
+        }
+        return (
           <>
-            <Meta
-              title= {record.ticket_type}
-              description = {record.description}
+            <InputNumber defaultValue={0} min={0} max={10} onChange={onChangeQuantity}
             />
           </>
-        ,
-      },
-      {
-        title: 'Số lượng',
-        dataIndex: 'quantity',
-        key: 'quantity',
-        render: (text, record, index) => {
-          const onChangeQuantity = (e) => {
-            if (e != null) {
-              record.quantity = e;
-              setDataSource(
-                dataSource.map((row, i) =>
-                  i === index ? { ...record, total: record.quantity*record.price } : row
-                )
-              );
-            }     
-            updateData();
-          }
-            return (
-            <>
-              <InputNumber defaultValue={0} min={0} max={10} onChange={onChangeQuantity}
-              />
-            </>
-          )
-        },
-      },
-      {
-        title: 'Giá (VNĐ)',
-        dataIndex: 'price',
-        key: 'price',
-        render: (price) => (
-          <>{helper.formatCurrency(price)}</>
         )
       },
-      {
-        title: 'Tổng (VNĐ)',
-        key: 'total',
-        dataIndex: 'total',
-        render: (total) => (
-          <>{helper.formatCurrency(total)}</>
-        )
-      }
-    ];
-  
+    },
+    {
+      title: 'Giá (VNĐ)',
+      dataIndex: 'price',
+      key: 'price',
+      width: 200,
+      render: (price) => (
+        <>{helper.formatCurrency(price)}</>
+      )
+    },
+    {
+      title: 'Tổng (VNĐ)',
+      key: 'total',
+      dataIndex: 'total',
+      render: (total) => (
+        <>{helper.formatCurrency(total)}</>
+      )
+    }
+  ];
+
   return (
 
-      <Card title="Chọn vé" style={{height: '100%', margin: 10}}>
-        <Table columns={columns} dataSource={[...dataSource]} pagination={false} rowKey={(record) => {return(record.type_id)}}/>
-      </Card>
-  
+    <Card title="Chọn vé" style={{ height: '100%', margin: 10 }}>
+      <Table columns={columns} dataSource={[...dataSource]} pagination={false} rowKey={(record) => { return (record.type_id) }} />
+    </Card>
+
   )
 }
 

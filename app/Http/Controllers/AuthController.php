@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class AuthController extends Controller
 {
@@ -82,8 +84,12 @@ class AuthController extends Controller
         }
         /** @var \App\Models\User */
         $user = Auth::user();
+
         $token = $user->createToken('token')->plainTextToken;
         $user->access_token = $token;
+        $user->api_token = $token;
+
+        $user->update();
         return response()->json([
             'status' => true,
             'message' => "Login successfully",

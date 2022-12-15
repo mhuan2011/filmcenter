@@ -5,7 +5,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import ReactQuill from 'react-quill';
 import { useNavigate, useParams } from 'react-router-dom';
 import { openNotification } from '../../Client/Helper/Notification';
-import { AppContext } from '../../Context'; 
+import { AppContext } from '../../Context';
 import 'react-quill/dist/quill.snow.css';
 import TextEditor from '../Helper/TextEditor';
 import SeatMap from './SeatMap';
@@ -22,7 +22,7 @@ const formItemLayout = {
 const { Search, TextArea } = Input;
 const dateFormat = 'YYYY/MM/DD';
 const ActCinemalHall = () => {
-  const { getCinemalHall, storeCinemalHall, updateCinemalHall,  getListCinema, getListCategory} = useContext(AppContext);
+  const { getCinemalHall, storeCinemalHall, updateCinemalHall, getListCinema, getListCategory } = useContext(AppContext);
 
   let navigate = useNavigate();
   const params = useParams();
@@ -41,56 +41,58 @@ const ActCinemalHall = () => {
     </Button>
   </>;
 
-    useEffect(() => {
-      getListCinema().then((res) => {
-        setCinema(res.data.data)
+  useEffect(() => {
+    getListCinema().then((res) => {
+      setCinema(res.data.data)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (params.id) {
+      setLoadingForm(true)
+      getCinemalHall(params.id).then((res) => {
+        form.setFieldsValue(res.data.data)
+        setTotalSeat(res.data.data.total_seat);
+        setItem(res.data.data)
+        setLoadingForm(false)
       })
-    }, [])
-
-    useEffect(() => {
-        if (params.id) {
-        setLoadingForm(true)
-        getCinemalHall(params.id).then((res) => {
-            form.setFieldsValue(res.data.data)
-            setTotalSeat(res.data.data.total_seat);
-            setItem(res.data.data)
-            setLoadingForm(false)
-        })
-        }
-    }, []);
-
-    const onSubmit = () => {
-        form.validateFields().then((values) => {
-        setLoadingForm(true)
-        const formData = new FormData();
-        if (params.id) formData.append("id", params.id)
-        if (values.name) formData.append("name", values.name)
-        if (values.cinema) formData.append("cinema", values.cinema_id)
-        if (values.total_seat) formData.append("total_seat", values.total_seat)
-
-        if (params.id) {
-            //update
-            updateCinemalHall(formData).then(function (res) {
-            setLoadingForm(false)
-            openNotification(res.data);
-            navigate("/admin/cinema-hall")
-            })
-        } else {
-            //store
-            storeCinemalHall(formData).then(function (res) {
-            setLoadingForm(false)
-            openNotification(res.data);
-            navigate("/admin/cinema-hall")
-            })
-        }
-        })
     }
-    const normFile = (e) => {
-        if (Array.isArray(e)) {
-        return e;
-        }
-        return e && e.fileList;
-    };
+  }, []);
+
+  const onSubmit = () => {
+    form.validateFields().then((values) => {
+      setLoadingForm(true)
+      const formData = new FormData();
+      if (params.id) formData.append("id", params.id)
+      if (values.name) formData.append("name", values.name)
+
+      if (values.total_seat) formData.append("total_seat", values.total_seat)
+
+      if (params.id) {
+        if (values.cinema_id) formData.append("cinema_id", values.cinema_id)
+        //update
+        updateCinemalHall(formData).then(function (res) {
+          setLoadingForm(false)
+          openNotification(res.data);
+          navigate("/admin/cinema-hall")
+        })
+      } else {
+        if (values.cinema_id) formData.append("cinema", values.cinema_id)
+        //store
+        storeCinemalHall(formData).then(function (res) {
+          setLoadingForm(false)
+          openNotification(res.data);
+          navigate("/admin/cinema-hall")
+        })
+      }
+    })
+  }
+  const normFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e && e.fileList;
+  };
 
 
   const onChange = (value) => {
@@ -128,7 +130,7 @@ const ActCinemalHall = () => {
                     rules={[{ required: true, message: 'Please Input name' }]}
                   >
                     <Input placeholder="Please Input name" />
-                  </Form.Item>       
+                  </Form.Item>
                   <Form.Item
                     label="Rạp"
                     name="cinema_id"
@@ -139,38 +141,34 @@ const ActCinemalHall = () => {
                       optionFilterProp="children"
                       placeholder="Select category"
                     >
-                        {cinema.map((record, index) => {
-                            return (
-                                <Select.Option key={index} value={record.id}>{record.name}</Select.Option>
-                            )
-                        })}
+                      {cinema.map((record, index) => {
+                        return (
+                          <Select.Option key={index} value={record.id}>{record.name}</Select.Option>
+                        )
+                      })}
                     </Select>
-                  </Form.Item>  
+                  </Form.Item>
                   <Form.Item
                     label="Số ghế"
                     name="total_seat"
                     style={{ marginBottom: 15 }}
                     rules={[{ required: true, message: 'Please Input duration' }]}
                   >
-                    <InputNumber 
-                        style={{width: '100%'}}
-                        min="0"
-                        max="100"
-                        step="14"
-                        stringMode
-                        onChange={onChange}
+                    <InputNumber
+                      style={{ width: '100%' }}
+                      min="0"
+                      max="100"
+                      step="14"
+                      stringMode
+                      onChange={onChange}
                     />
                   </Form.Item>
                 </Col>
               </Row>
             </Form>
           </Spin>
-
-
-         
         </Card>
-
-        <SeatMap totalSeat={totalSeat}/>
+        <SeatMap totalSeat={totalSeat} />
       </div>
     </>
   )

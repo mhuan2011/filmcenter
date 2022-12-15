@@ -24,7 +24,9 @@ class User extends Authenticatable
         'email',
         'password',
         'phone',
-        'username'
+        'username',
+        'role_id',
+        'address'
     ];
 
     /**
@@ -45,10 +47,4 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
-    //relationship
-    public function role()
-    {
-        return $this->belongsTo(Role::class);
-    }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Seat;
 use App\Models\Show;
 use App\Models\ShowSeat;
+use Error;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -21,18 +22,30 @@ class ShowController extends Controller
         ]);
     }
 
-    public function getlistTicket($id)
+    public function getlistTicket(Request $request)
     {
-        $data = ShowSeat::selectRaw("show_seat.id, show_seat.status, seat.row, seat.number, users.id as user_id, users.name as username, reservation.id as reservation_id")->where('show_id', $id)
-            ->leftJoin("seat", "seat.id", "=", "show_seat.seat_id")
-            ->leftJoin("reservation", "reservation.id", "=", "show_seat.reservation_id")
-            ->leftJoin("users", "users.id", "=", "reservation.user_id")
+        $all = $request->all();
+        try {
+            $id = $all['show_id'];
+            $keyword = $all['key_search'] ? $all['key_search'] : "";
+            $data = ShowSeat::selectRaw("show_seat.id, show_seat.status, seat.row, seat.number, users.id as user_id, users.name as username, reservation.id as reservation_id, reservation.status as reservation_status")->where('show_id', $id)
+                ->leftJoin("seat", "seat.id", "=", "show_seat.seat_id")
+                ->leftJoin("reservation", "reservation.id", "=", "show_seat.reservation_id")
+                ->leftJoin("users", "users.id", "=", "reservation.user_id")
+                ->orderBy('show_seat.id', 'ASC');
 
-            ->orderBy('show_seat.id', 'ASC')->get();
-        return response()->json([
-            'status' => true,
-            'data' => $data,
-        ]);
+            if ($keyword != '') {
+                $data = $data->whereRaw('reservation.id LIKE \'%' . $keyword . '%\'');
+            }
+
+            $data = $data->get();
+
+            return response()->json([
+                'status' => true,
+                'data' => $data,
+            ]);
+        } catch (Error $err) {
+        }
     }
 
     public function getSeatMap(Request $request)
@@ -40,7 +53,6 @@ class ShowController extends Controller
         try {
             $show_id = $request->show_id;
             $cinema_hall = Show::where('id', $show_id)->first();
-
             $row = Seat::where('cinema_hall_id', $cinema_hall->cinema_hall_id)->groupBy('row')->orderBy('row', 'DESC')->get('row');
 
 
@@ -73,7 +85,7 @@ class ShowController extends Controller
 
     public function getitem($id)
     {
-        $item = Show::where("id", $id)->first();
+        $item = Show::where("id", $id)->with(["movies", "cinema_hall"])->first();
         if (is_null($item)) {
             return response()->json([
                 'status' => false,
@@ -104,6 +116,7 @@ class ShowController extends Controller
             $new->end_time = $request->end_time;
             $new->movie_id = $request->movie_id;
             $new->cinema_hall_id = $request->cinema_hall_id;
+            $new->price = $request->price;
 
             $result = $new->save();
             if ($result) {

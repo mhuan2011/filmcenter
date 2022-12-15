@@ -133,8 +133,8 @@ const Provider = ({ children }) => {
     updateCategory: (keyID, values) => {
       return axios.post(`/api/category/update/${keyID}`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
-    deleteCategory: () => {
-      return axios.get('/api/category/delete/{id}', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    deleteCategory: (keyID) => {
+      return axios.get(`/api/category/delete/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
 
     //person
@@ -158,7 +158,7 @@ const Provider = ({ children }) => {
     getListCountry: () => {
       return axios.get('/api/country/getlist', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
-    
+
     // Movies
     getMovies: (keyID) => {
       return axios.get(`/api/movies/getitem/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
@@ -202,11 +202,11 @@ const Provider = ({ children }) => {
     getShow: (keyID) => {
       return axios.get(`/api/show/getitem/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
-    getTicket: (keyID) => {
-      return axios.get(`/api/show/getlist/ticket/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    getTicket: (values) => {
+      return axios.post(`/api/show/getlist/ticket`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
     getSeatMap: (values) => {
-      return axios.post(`/api/show/getseatmap`, values,  { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+      return axios.post(`/api/show/getseatmap`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
     getListShow: () => {
       return axios.get('/api/show/getlist', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
@@ -308,11 +308,28 @@ const Provider = ({ children }) => {
       return axios.post(`/api/user/detail`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
 
+    getReservationUser: (keyID) => {
+      return axios.get(`/api/reservation-history/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
 
+    cancleReservation: (values) => {
+      return axios.post(`/api/cancle-reservation`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    tranferTicket: (values) => {
+      return axios.post(`/api/tranfer-ticket`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
 
     // cms user
     getListUser: () => {
       return axios.get(`/api/user/getlist`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    getRoleOfUser: (values) => {
+      return axios.post('/api/user/get-role', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    updateRoleOfUser: (values) => {
+      return axios.post('/api/user/update-roles-user', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
 
     //dashboard
@@ -328,25 +345,65 @@ const Provider = ({ children }) => {
       return axios.get('/api/cinemahall-of-cinema', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
 
+    // roles
+    getListRole: () => {
+      return axios.get('/api/role/getlist', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    storeRole: (values) => {
+      return axios.post('/api/role/store', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    getRole: (id) => {
+      return axios.get(`/api/role/getitem/${id}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    updateRole: (values) => {
+      return axios.post('/api/role/update', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    addPermissionToRole: (values) => {
+      return axios.post('/api/role/add-permission-roles', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    getPermissionOfRole: (values) => {
+      return axios.post('/api/role/get-permission', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    // permisson
+    getListPermission: () => {
+      return axios.get('/api/permission/getlist', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    storePermission: (values) => {
+      return axios.post('/api/permission/store', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    getPermission: (id) => {
+      return axios.get(`/api/permission/getitem/${id}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+    updatePermission: (values) => {
+      return axios.post('/api/permission/update', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
     getParams: () => {
       var url = window.location.href;
-        var params = url.split(['?'])[1];
-        var values = [];
-        if(params) {
-          params = params.split('&');
-          params.forEach(element => {
-            element = element.split('=');
-            values.push({
-              key:element[0],
-              value: element[1] 
-            })
-          });
-        }
-        return values;
+      var params = url.split(['?'])[1];
+      var values = [];
+      if (params) {
+        params = params.split('&');
+        params.forEach(element => {
+          element = element.split('=');
+          values.push({
+            key: element[0],
+            value: element[1]
+          })
+        });
+      }
+      return values;
     }
   }
 
-  
+
   return (
     <AppContext.Provider value={value}>
       {children}

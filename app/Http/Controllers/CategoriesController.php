@@ -4,10 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Categories;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class CategoriesController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth:api']);
+
+        // $this->middleware('can:category.getlist')->only("getlist");
+    }
 
     public function getlist()
     {
@@ -54,7 +61,6 @@ class CategoriesController extends Controller
     //store category
     public function store(Request $request)
     {
-        $this->authorize('create-update-categories');
         $new = new Categories();
         try {
             $validatedData = Validator::make($request->all(), [
@@ -87,7 +93,6 @@ class CategoriesController extends Controller
     //update
     public function update(Request $request, $id)
     {
-        $this->authorize('create-update-categories');
         $category = Categories::where('id', $id)->first();
         if ($category == "") {
             return response()->json([
@@ -111,7 +116,6 @@ class CategoriesController extends Controller
 
     public function delete($id)
     {
-        $this->authorize('create-update-categories');
         $category = Categories::findOrFail($id);
         $category->delete();
         return response()->json([

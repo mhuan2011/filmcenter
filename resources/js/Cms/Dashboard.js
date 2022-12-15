@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 import moment from 'moment';
 import { Row, Col, Card, DatePicker, Select, Spin } from 'antd';
-import { AppContext } from '../Context'; 
+import { AppContext } from '../Context';
 import Highcharts from 'highcharts'
 // import HighchartsReact from 'highcharts-react-official'
 
@@ -9,7 +9,7 @@ import Chart from "react-apexcharts";
 import CinemaChart from './Dashboard/CinemaChart';
 
 const { RangePicker } = DatePicker;
-
+const date = new Date();
 
 const dateFormat = 'YYYY-MM-DD';
 const initchartData = {
@@ -50,10 +50,10 @@ const initchartData = {
   },
 };
 const Dashboard = () => {
-  const { user, statisticByDate, revenueByDate} = useContext(AppContext);
+  const { user, statisticByDate, revenueByDate } = useContext(AppContext);
   const [data, setData] = useState({
-    time_start: '2022-09-01',
-    time_end: '2022-9-30',
+    time_start: new Date(),
+    time_end: new Date() + 30,
     store_id: user ? user.store_id : 0,
   });
 
@@ -78,19 +78,19 @@ const Dashboard = () => {
   }, [])
 
   useEffect(() => {
-      if(data) {
-        setLoading(true);
-        statisticByDate(data).then((res) => {
-          setStatistic(res.data.data);
-          
-        })
-        revenueByDate(data).then((res) => {
-          setRawData(res.data.data);
-          setLoading(false);
-        })
+    if (data) {
+      setLoading(true);
+      statisticByDate(data).then((res) => {
+        setStatistic(res.data.data);
 
-      }
-      
+      })
+      revenueByDate(data).then((res) => {
+        setRawData(res.data.data);
+        setLoading(false);
+      })
+
+    }
+
   }, [data])
 
   const onChangeDate = (dates, dateStrings) => {
@@ -98,8 +98,6 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    console.log(rawData)
-    console.log(chartData.series[0].data)
     let arr = [];
     let arrData = [];
     if (rawData) {
@@ -150,20 +148,20 @@ const Dashboard = () => {
     <>
       <Row justify='space-between'>
         <Col>
-        {user.role_id == 1 ?
-          <Select
-            optionFilterProp="children"
-            style={{ width: '200px'}}
-            defaultValue={0}
-          >
-            <Select.Option key="0" value={0}>Tất cả các rạp</Select.Option>
-            {/* {stores && stores.map((item) => <Select.Option key={item.id} value={item.id}>{item.name}</Select.Option>)} */}
-          </Select>
-          : null}
+          {user.role_id == 1 ?
+            <Select
+              optionFilterProp="children"
+              style={{ width: '200px' }}
+              defaultValue={0}
+            >
+              <Select.Option key="0" value={0}>Tất cả các rạp</Select.Option>
+              {/* {stores && stores.map((item) => <Select.Option key={item.id} value={item.id}>{item.name}</Select.Option>)} */}
+            </Select>
+            : null}
         </Col>
         <Col span={8}>
           <RangePicker
-            defaultValue={[moment('2022-09-01', dateFormat), moment('2022-09-30', dateFormat)]}
+            defaultValue={[moment(new Date(date.getFullYear(), date.getMonth(), 1), dateFormat), moment(new Date(date.getFullYear(), date.getMonth() + 1, 0), dateFormat)]}
             onChange={onChangeDate}
             format={dateFormat}
             allowClear={false}
@@ -174,23 +172,23 @@ const Dashboard = () => {
         <Col className="gutter-row" span={6}>
           <Spin spinning={loading}>
             <Card title="Doanh thu" style={{ textAlign: "center" }}>
-              { statistic.amount ? `${statistic.amount}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : 0} VND
+              {statistic.amount ? `${statistic.amount}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : 0} VND
             </Card>
           </Spin>
         </Col>
         <Col className="gutter-row" span={6}>
           <Spin spinning={loading}>
-          <Card title="Tổng số phim" style={{ textAlign: "center" }}>
-            {statistic.movies}
-          </Card>
+            <Card title="Tổng số phim" style={{ textAlign: "center" }}>
+              {statistic.movies}
+            </Card>
           </Spin>
-          
+
         </Col>
         <Col className="gutter-row" span={6}>
           <Spin spinning={loading}>
-          <Card title="Tổng số rạp" style={{ textAlign: "center" }}>
-            {statistic.cinema}
-          </Card>
+            <Card title="Tổng số rạp" style={{ textAlign: "center" }}>
+              {statistic.cinema}
+            </Card>
           </Spin>
         </Col>
         <Col className="gutter-row" span={6}>
@@ -198,16 +196,16 @@ const Dashboard = () => {
             <Card title="Số lượng nhân viên" style={{ textAlign: "center" }}>
               {statistic.users}
             </Card>
-            </Spin>
+          </Spin>
         </Col>
       </Row>
-      <Row style={{ marginTop: '12px' }}> 
-          <Col span={12}>
-            <Chart options={chartData.options} series={chartData.series} type="line" height={350} />
-          </Col>
-          <Col span={12}>
-            <CinemaChart dataDate={data}/>
-          </Col>
+      <Row style={{ marginTop: '12px' }}>
+        <Col span={12}>
+          <Chart options={chartData.options} series={chartData.series} type="line" height={350} />
+        </Col>
+        <Col span={12}>
+          <CinemaChart dataDate={data} />
+        </Col>
       </Row>
     </>
   )

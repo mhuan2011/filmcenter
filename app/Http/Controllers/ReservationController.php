@@ -20,9 +20,9 @@ class ReservationController extends Controller
         try {
             $user_id = $data['user_id'];
             $seats = $data['reserveSeat'];
-
+            $is_pay = isset($data['is_pay']) ? $data['is_pay'] : false;
             $now = Carbon::now();
-            $unique_code = $now->format('YmdHisu');
+            $unique_code = Carbon::now()->timestamp;
 
             // checl
 
@@ -54,7 +54,10 @@ class ReservationController extends Controller
                         $res = ShowSeat::where('id', $seat)->update(['reservation_id' => $unique_code, 'status' => 1]);
                     }
                 }
-                CheckReservation::dispatch($unique_code, $seats)->delay(Carbon::now('Asia/Ho_Chi_Minh')->addSeconds(600));
+
+                if ($is_pay) {
+                    CheckReservation::dispatch($unique_code, $seats)->delay(Carbon::now('Asia/Ho_Chi_Minh')->addSeconds(600));
+                }
             }
 
             return response()->json([
@@ -62,13 +65,97 @@ class ReservationController extends Controller
                 'data' => [
                     'reservation_id' => $unique_code,
                 ],
-                'message' => "Reservation complete",
+                'message' => "Đặt vé thành công",
             ]);
         } catch (\Exception $err) {
             return response()->json([
                 'status' => false,
                 'message' => $err->getMessage()
             ]);
+        }
+    }
+
+    // huy ve
+    public function cancleReservation(Request $request)
+    {
+        $data = $request->all();
+        $id = isset($data['resevation_id']) ? $data['resevation_id'] : "";
+        if ($id) {
+            $show_id = ShowSeat::where("reservation_id", $id)->first()->show_id;
+            if ($show_id) {
+                $show  = Show::where("id", $show_id)->first();
+
+                $date = $show->date;
+                $start = $show->start_time;
+
+                $date_now = date('Y-m-d');
+                $time_now = date('h:i:s');
+
+
+                $startTime = Carbon::parse($date_now);
+                $finishTime = Carbon::parse($time_now);
+
+
+                $check = $this->checkPaymenth($id);
+                switch ($check) {
+                    case 1: {
+                            return response()->json([
+                                'status' => false,
+                                'message' => "Không thể hủy vé đã thanh toán !"
+                            ]);
+                        }
+                    case 2: {
+                            return response()->json([
+                                'status' => false,
+                                'message' => "Vé không tồn tại!",
+                                'code' => 1
+                            ]);
+                        }
+                }
+
+
+                /* Ngày chiếu là ngày hiện tại */
+                if ($date == $date_now) {
+                    $time = $finishTime->diffInHours($start);
+                    /* Nếu thời gian hiện tại trong khoảng 1h trước giờ chiếu */
+                    if ($time < 1) {
+                        return response()->json([
+                            'status' => false,
+                            'message' => "Không thể hủy vé trong trước thời gian chiếu 1 giờ !"
+                        ]);
+                    }
+                } else {
+                    // hủy vé
+                    $ss = ShowSeat::where("reservation_id", $id)->get();
+                    foreach ($ss as $s) {
+                        if ($s) {
+                            $s->status = 0;
+                            $s->reservation_id = "";
+                            $s->save();
+                        }
+                    }
+                    $reserve = Reservation::find($id);
+                    $reserve->status = "Đã hủy";
+                    $reserve->save();
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => "Hủy vé thành công !"
+                    ], 200);
+                }
+            }
+        }
+    }
+    // Kiểm tra trạng thái thanh toán
+    protected function checkPaymenth($reservation_id)
+    {
+        $reserve = Reservation::find($reservation_id);
+        if ($reserve) {
+            $status = $reserve->status;
+            if ($status == "Thanh toán") return 1;
+            if ($status == "Đã hủy") return 2;
+        } else {
+            return 3;
         }
     }
 }

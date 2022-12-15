@@ -1,24 +1,33 @@
-import { BarcodeOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Image, Popconfirm, Space, Table, Tag } from 'antd';
+import { BarcodeOutlined, DeleteOutlined, EditOutlined, ToolOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, Image, Popconfirm, Space, Table, Tag, Tooltip } from 'antd';
+import { received } from 'laravel-mix/src/Log';
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { openNotification } from '../../Client/Helper/Notification'; 
-import { AppContext } from '../../Context'; 
+import { openNotification } from '../../Client/Helper/Notification';
+import { AppContext } from '../../Context';
+import ActRoleUser from './ActRoleUser';
 
 const UserList = () => {
   let navigate = useNavigate();
   const { getListCinema, getListUser } = useContext(AppContext);
   const [data, setData] = useState();
   const [loadingTable, setLoadingTable] = useState(true);
-  const [categories, setCategories] = useState([])
+  const [open, setOpen] = useState(false);
+  const [itemCP, setItemCP] = useState({});
+  const [refresh, setRefresh] = useState(null)
+
   useEffect(() => {
+    getList();
+  }, [refresh])
+
+  const getList = () => {
     setLoadingTable(true);
     getListUser().then((res) => {
-        setData(res.data);
+      setData(res.data);
       setLoadingTable(false)
     });
-    
-  }, [])
+  }
+
   const columns = [
     {
       title: 'ID',
@@ -31,17 +40,12 @@ const UserList = () => {
       dataIndex: 'name',
       key: 'name',
       width: 250,
-    },
-    {
-      title: 'Tên đăng nhập',
-      dataIndex: 'username',
-      key: 'username',
-      width: 250,
-      render: (username) => {
-        return (
-          <strong>{username}</strong>
-        );
-    }
+      render: (_, record) => (
+        <>
+          {record.name} <br></br>
+          <small>{"username: " + record.username}</small>
+        </>
+      )
     },
     {
       title: 'Phone',
@@ -55,50 +59,78 @@ const UserList = () => {
       }
     },
     {
-        title: 'Email',
-        dataIndex: 'email',
-        key: 'email',
-        
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+
     },
     {
-        title: 'Role',
-        dataIndex: 'role_id',
-        key: 'role_id',
-        width: 150,
-        render: (role_id) => {
-            let color = 'blue'
-            if(role_id == 1) {
-                color  =  'volcano';
-            }else if( role_id == 2){
-                color  =  'gold';
-            }
+      title: 'Role',
+      dataIndex: 'role_id',
+      key: 'role_id',
+      width: 250,
 
+      render: (_, record) => {
+        let roles = record.roles;
 
-            let text = "Khách hàng";
-            if(role_id == 1 ) text = "Nhân viên"
-            else if(role_id == 2) text = "Quản lý";
-            return (
-            <Tag color={color}>
-                {text.toUpperCase()}
+        let colorArr = [];
+        roles.forEach(ele => {
+          let role_id = ele.id
+          let color = 'blue'
+          if (role_id == 2) {
+            color = 'volcano';
+          } else if (role_id == 1) {
+            color = 'gold';
+          }
+          colorArr.push(color);
+        });
+
+        const ren = roles.map((ele, i) => {
+          return (
+            <Tag color={colorArr[i]} key={i}>
+              {ele.name.toUpperCase()}
             </Tag>
-            );
-        }
+          )
+        })
+        return (
+          <>{ren}</>
+        );
+      }
     },
-{
+    {
+      title: 'Acl',
+      dataIndex: 'acl',
+      key: 'acl',
+      width: 70,
+      render: (_, record) => {
+        return (
+          <Tooltip placement="bottom" title="Add permisson">
+            <Button type="dashed" shape="circle" icon={<ToolOutlined />} onClick={() => onAcl(record)} ></Button>
+          </Tooltip>
+        )
+      }
+    },
+    {
       title: 'Action',
       key: 'action',
-      width: 100,
+      width: 120,
       fixed: 'right',
       render: (text, record) => (
         <Space size="middle">
-          <Button type="link" size="small" onClick={() => update(record)}><EditOutlined /></Button>
+          <Button type="dashed" shape="circle" onClick={() => update(record)} icon={<EditOutlined />}></Button>
           <Popconfirm title="Xóa tài khoản này?" placement="leftTop" onConfirm={() => remove(record)}>
-            <Button type="link" size="small" danger><DeleteOutlined /></Button>
+            <Button type="dashed" shape="circle" danger icon={<DeleteOutlined />}></Button>
           </Popconfirm>
         </Space>
       ),
     },
   ];
+
+  const onAcl = (record) => {
+    setItemCP({ ...record });
+    setOpen(true);
+  }
+
   const update = (record) => {
     navigate(`/admin/users/detail/${record.id}`)
   }
@@ -128,6 +160,7 @@ const UserList = () => {
           loading={loadingTable}
         />
       </div>
+      <ActRoleUser open={open} setOpen={setOpen} itemCP={itemCP} setRefresh={setRefresh} />
     </>
   )
 }

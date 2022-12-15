@@ -383,4 +383,21 @@ class PaymenController extends Controller
 
         return $data;
     }
+
+
+    public function paymentWithReservationId(Request $request)
+    {
+        $data = $request->all();
+        try {
+            $reservation_id = isset($data['reservation_id']) ? $data['reservation_id'] : "";
+            if ($reservation_id) {
+                $reservation = Reservation::find($reservation_id);
+            }
+        } catch (Exception $err) {
+            return response()->json([
+                "status" => false,
+                "messgae" => "error" . $err
+            ]);
+        }
+    }
 }

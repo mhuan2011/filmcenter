@@ -21,7 +21,7 @@ const formItemLayout = {
 const { Search, TextArea } = Input;
 const dateFormat = 'YYYY/MM/DD';
 const ActShow = () => {
-  const { getShow, storeShow, updateShow,  getListMovies, getListCinemalHall} = useContext(AppContext);
+  const { getShow, storeShow, updateShow, getListMovies, getListCinemalHall } = useContext(AppContext);
 
   let navigate = useNavigate();
   const params = useParams();
@@ -44,66 +44,67 @@ const ActShow = () => {
     </Button>
   </>;
 
-    useEffect(() => {
-        getListMovies().then((res) => {
-            setMovies(res.data.data);
-        });
-        getListCinemalHall().then((res) => {
-            setCinameHall(res.data.data);
-        });
-    }, [])
+  useEffect(() => {
+    getListMovies().then((res) => {
+      setMovies(res.data.data);
+    });
+    getListCinemalHall().then((res) => {
+      setCinameHall(res.data.data);
+    });
+  }, [])
 
-    useEffect(() => {
-        if (params.id) {
-        setLoadingForm(true)
-        getShow(params.id).then((res) => {
+  useEffect(() => {
+    if (params.id) {
+      setLoadingForm(true)
+      getShow(params.id).then((res) => {
 
-            var dataSource = res.data.data;
-            dataSource.date = moment(dataSource.date)
-            dataSource.start_time = moment(dataSource.start_time, 'HH:mm:ss');
-            dataSource.end_time = moment(dataSource.end_time, 'HH:mm:ss');
+        var dataSource = res.data.data;
+        dataSource.date = moment(dataSource.date)
+        dataSource.start_time = moment(dataSource.start_time, 'HH:mm:ss');
+        dataSource.end_time = moment(dataSource.end_time, 'HH:mm:ss');
 
-            form.setFieldsValue(dataSource)
-            setItem(dataSource)
-            setLoadingForm(false)
-        })
-        }
-    }, []);
-
-    const onSubmit = () => {
-        form.validateFields().then((values) => {
-        setLoadingForm(true)
-        const formData = new FormData();
-        if (params.id) formData.append("id", params.id)
-        if (values.date) formData.append("date", moment(values.date).format('YYYY-MM-DD'))
-        if (values.start_time) formData.append("start_time", moment(values.start_time).format('hh:mm:ss'))
-        if (values.end_time) formData.append("end_time", moment(values.end_time).format('hh:mm:ss'))
-        if (values.movie_id) formData.append("movie_id", values.movie_id)
-        if (values.cinema_hall_id) formData.append("cinema_hall_id", values.cinema_hall_id)
-
-        if (params.id) {
-            //update
-            updateShow(formData).then(function (res) {
-            setLoadingForm(false)
-            openNotification(res.data);
-            navigate("/admin/show")
-            })
-        } else {
-            //store
-            storeShow(formData).then(function (res) {
-            setLoadingForm(false)
-            openNotification(res.data);
-            navigate("/admin/show")
-            })
-        }
-        })
+        form.setFieldsValue(dataSource)
+        setItem(dataSource)
+        setLoadingForm(false)
+      })
     }
-    const normFile = (e) => {
-        if (Array.isArray(e)) {
-        return e;
-        }
-        return e && e.fileList;
-    };
+  }, []);
+
+  const onSubmit = () => {
+    form.validateFields().then((values) => {
+      setLoadingForm(true)
+      const formData = new FormData();
+      if (params.id) formData.append("id", params.id)
+      if (values.date) formData.append("date", moment(values.date).format('YYYY-MM-DD'))
+      if (values.start_time) formData.append("start_time", moment(values.start_time).format('HH:mm:ss'))
+      if (values.end_time) formData.append("end_time", moment(values.end_time).format('HH:mm:ss'))
+      if (values.movie_id) formData.append("movie_id", values.movie_id)
+      if (values.cinema_hall_id) formData.append("cinema_hall_id", values.cinema_hall_id)
+      if (values.price) formData.append("price", values.price)
+
+      if (params.id) {
+        //update
+        updateShow(formData).then(function (res) {
+          setLoadingForm(false)
+          openNotification(res.data);
+          navigate("/admin/show")
+        })
+      } else {
+        //store
+        storeShow(formData).then(function (res) {
+          setLoadingForm(false)
+          openNotification(res.data);
+          navigate("/admin/show")
+        })
+      }
+    })
+  }
+  const normFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e && e.fileList;
+  };
 
 
   const onChange = (value) => {
@@ -141,7 +142,7 @@ const ActShow = () => {
                     rules={[{ required: true, message: 'Please Input name' }]}
                   >
                     <DatePicker />
-                  </Form.Item>        
+                  </Form.Item>
                   <Form.Item
                     label="Thời gian bắt đầu"
                     name="start_time"
@@ -149,7 +150,7 @@ const ActShow = () => {
                     rules={[{ required: true, message: 'Please Input duration' }]}
                   >
                     <TimePicker />
-                    
+
                   </Form.Item>
                   <Form.Item
                     label="Thời gian kết thúc"
@@ -158,7 +159,7 @@ const ActShow = () => {
                     rules={[{ required: true, message: 'Please Input name' }]}
                   >
                     <TimePicker />
-                  </Form.Item>   
+                  </Form.Item>
                   <Form.Item
                     label="Phim"
                     name="movie_id"
@@ -169,13 +170,13 @@ const ActShow = () => {
                       optionFilterProp="children"
                       placeholder="Select category"
                     >
-                        {movies.map((record, index) => {
-                            return (
-                                <Select.Option key={index} value={record.id}>{record.title}</Select.Option>
-                            )
-                        })}
+                      {movies.map((record, index) => {
+                        return (
+                          <Select.Option key={index} value={record.id}>{record.title}</Select.Option>
+                        )
+                      })}
                     </Select>
-                  </Form.Item>  
+                  </Form.Item>
                   <Form.Item
                     label="Rạp"
                     name="cinema_hall_id"
@@ -186,20 +187,28 @@ const ActShow = () => {
                       optionFilterProp="children"
                       placeholder="Select category"
                     >
-                        {cinemaHall.map((record, index) => {
-                            return (
-                                <Select.Option key={index} value={record.id}>{record.name}</Select.Option>
-                            )
-                        })}
+                      {cinemaHall.map((record, index) => {
+                        return (
+                          <Select.Option key={index} value={record.id}>{record.name}</Select.Option>
+                        )
+                      })}
                     </Select>
-                  </Form.Item>  
+                  </Form.Item>
+                  <Form.Item
+                    label="Giá vé"
+                    name="price"
+                    style={{ marginBottom: 15 }}
+                    rules={[{ required: true, message: 'Please Input ticket price' }]}
+                  >
+                    <InputNumber addonBefore="VND" style={{ width: "100%" }} />
+                  </Form.Item>
                 </Col>
               </Row>
             </Form>
           </Spin>
 
 
-         
+
         </Card>
 
         {/* <SeatMap totalSeat={totalSeat}/> */}
