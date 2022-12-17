@@ -636,3 +636,7 @@ background: url('https://www.kinomeister.de/wp-content/uploads/2020/08/sith4.jpg
 .model-custom {
 	width: 1300px !important;
 }
+
+.click-tag {
+	cursor: pointer;
+}

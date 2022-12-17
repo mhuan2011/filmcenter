@@ -2,11 +2,9 @@ import { RollbackOutlined, SaveOutlined, UploadOutlined } from '@ant-design/icon
 import { Breadcrumb, Button, Card, Col, DatePicker, Form, Image, Input, InputNumber, Row, Select, Spin, TimePicker, Upload } from 'antd';
 import moment from 'moment';
 import React, { useContext, useEffect, useState } from 'react';
-import ReactQuill from 'react-quill';
 import { useNavigate, useParams } from 'react-router-dom';
 import { openNotification } from '../../Client/Helper/Notification';
 import { AppContext } from '../../Context';
-import 'react-quill/dist/quill.snow.css';
 import TextEditor from '../Helper/TextEditor';
 
 const initialValues = {
@@ -21,7 +19,7 @@ const formItemLayout = {
 const { Search, TextArea } = Input;
 
 const ActCinema = () => {
-  const { storeCinema, updateCinema,  getCinema} = useContext(AppContext);
+  const { storeCinema, updateCinema, getCinema } = useContext(AppContext);
 
   let navigate = useNavigate();
   const params = useParams();
@@ -41,46 +39,46 @@ const ActCinema = () => {
     </Button>
   </>;
 
-    useEffect(() => {
-    }, [])
+  useEffect(() => {
+  }, [])
 
-    useEffect(() => {
-        if (params.id) {
-        setLoadingForm(true)
-        getCinema(params.id).then((res) => {
-            var dataSource = res.data.data;
-            form.setFieldsValue(dataSource)
-            setItem(dataSource)
-            setLoadingForm(false)
-        })
-        }
-    }, []);
-
-    const onSubmit = () => {
-        form.validateFields().then((values) => {
-        setLoadingForm(true)
-        const formData = new FormData();
-        if (params.id) formData.append("id", params.id)
-        if (values.name) formData.append("name", values.name)
-        if (values.address) formData.append("address", values.address);
-
-        if (params.id) {
-            //update
-            updateCinema(formData).then(function (res) {
-            setLoadingForm(false)
-            openNotification(res.data);
-            navigate("/admin/cinema");
-            })
-        } else {
-            //store
-            storeCinema(formData).then(function (res) {
-            setLoadingForm(false)
-            openNotification(res.data);
-            navigate("/admin/cinema");
-            })
-        }
-        })
+  useEffect(() => {
+    if (params.id) {
+      setLoadingForm(true)
+      getCinema(params.id).then((res) => {
+        var dataSource = res.data.data;
+        form.setFieldsValue(dataSource)
+        setItem(dataSource)
+        setLoadingForm(false)
+      })
     }
+  }, []);
+
+  const onSubmit = () => {
+    form.validateFields().then((values) => {
+      setLoadingForm(true)
+      const formData = new FormData();
+      if (params.id) formData.append("id", params.id)
+      if (values.name) formData.append("name", values.name)
+      if (values.address) formData.append("address", values.address);
+
+      if (params.id) {
+        //update
+        updateCinema(formData).then(function (res) {
+          setLoadingForm(false)
+          openNotification(res.data);
+          navigate("/admin/cinema");
+        })
+      } else {
+        //store
+        storeCinema(formData).then(function (res) {
+          setLoadingForm(false)
+          openNotification(res.data);
+          navigate("/admin/cinema");
+        })
+      }
+    })
+  }
 
   return (
     <>
@@ -113,15 +111,15 @@ const ActCinema = () => {
                     style={{ marginBottom: 15 }}
                     rules={[{ required: true, message: 'Please Input name' }]}
                   >
-                    <Input placeholder='Nhập tên rạp'/>
-                  </Form.Item>        
+                    <Input placeholder='Nhập tên rạp' />
+                  </Form.Item>
                   <Form.Item
                     label="Địa chỉ"
                     name="address"
                     style={{ marginBottom: 15 }}
                     rules={[{ required: true, message: 'Please Input duration' }]}
                   >
-                    <TextArea rows={5} placeholder='Nhập địa chỉ'/>
+                    <TextArea rows={5} placeholder='Nhập địa chỉ' />
                   </Form.Item>
                 </Col>
               </Row>
@@ -129,7 +127,7 @@ const ActCinema = () => {
           </Spin>
 
 
-         
+
         </Card>
 
         {/* <SeatMap totalSeat={totalSeat}/> */}

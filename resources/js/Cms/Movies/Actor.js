@@ -1,30 +1,27 @@
 import { RollbackOutlined, SaveOutlined, UploadOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Card, Col, DatePicker, Form, Image, Input, InputNumber, Row, Select, Spin, Divider  } from 'antd';
+import { Breadcrumb, Button, Card, Col, DatePicker, Form, Image, Input, InputNumber, Row, Select, Spin, Divider } from 'antd';
 import moment from 'moment';
 import React, { useContext, useEffect, useState } from 'react';
-import ReactQuill from 'react-quill';
 import { useNavigate, useParams } from 'react-router-dom';
 import { openNotification } from '../../Client/Helper/Notification';
-import { AppContext } from '../../Context'; 
-import 'react-quill/dist/quill.snow.css';
-import TextEditor from '../Helper/TextEditor';
+import { AppContext } from '../../Context';
 
 const initialValues = {
-  stars: [],
-  directors: [],
+    stars: [],
+    directors: [],
 }
 
 const formItemLayout = {
-  labelCol: { span: 6 },
-  wrapperCol: { span: 17 },
+    labelCol: { span: 6 },
+    wrapperCol: { span: 17 },
 };
 const { Search, TextArea } = Input;
 const dateFormat = 'YYYY/MM/DD';
 
 const { Option } = Select;
 const children = [];
-const Actor = ({keyID}) => {
-    const { getMovies, getActors, getListPerson,  getListCountry, getListCategory, updateStar} = useContext(AppContext);
+const Actor = ({ keyID }) => {
+    const { getMovies, getActors, getListPerson, getListCountry, getListCategory, updateStar } = useContext(AppContext);
 
     let navigate = useNavigate();
     const params = useParams();
@@ -37,7 +34,7 @@ const Actor = ({keyID}) => {
     const [person, setPerson] = useState([]);
     const [btnLoading, setBtnLoading] = useState(false);
 
-        
+
     const [star, setStar] = useState([]);
     const [director, setDirector] = useState([]);
 
@@ -54,8 +51,8 @@ const Actor = ({keyID}) => {
             setPerson(res.data.data)
         })
 
-        getActors({keyID}).then((res) => {
-            if(res.data.data) {
+        getActors({ keyID }).then((res) => {
+            if (res.data.data) {
                 var data = res.data.data;
                 var arr1 = [], arr2 = [];
                 data.director.forEach(element => {
@@ -72,16 +69,16 @@ const Actor = ({keyID}) => {
                     directors: arr1
                 })
             }
-          })
-        
+        })
+
     }, [])
 
-    
+
 
     for (let i = 10; i < 36; i++) {
         children.push(<Option key={i.toString(36) + i}>{i.toString(36) + i}</Option>);
-      }
-      
+    }
+
     const changeStar = (value) => {
         setStar(value);
     };
@@ -106,72 +103,72 @@ const Actor = ({keyID}) => {
 
     return (
         <>
-        
-        <div className="site-layout-background" style={{ minHeight: 480 }}>
-            <Divider orientation="left" plain>
-                Nhân vật
-            </Divider>
 
-            
+            <div className="site-layout-background" style={{ minHeight: 480 }}>
+                <Divider orientation="left" plain>
+                    Nhân vật
+                </Divider>
 
-            <Form
-              {...formItemLayout}
-              layout="horizontal"
-              form={form}
-              labelAlign="left"
-              initialValues={initialValues}
-            >
-                <Row>
-                    <Col xs={24} xl={12}>
-                        <Form.Item
-                            label="Diễn viên"
-                            name="stars"
-                            style={{ marginBottom: 15 }}
-                        >
-                            <Select
-                                mode="multiple"
-                                allowClear
-                                style={{
-                                    width: '100%',
-                                }}
-                                placeholder="Chọn diễn viên"
-                                onChange={changeStar}
-                                > 
+
+
+                <Form
+                    {...formItemLayout}
+                    layout="horizontal"
+                    form={form}
+                    labelAlign="left"
+                    initialValues={initialValues}
+                >
+                    <Row>
+                        <Col xs={24} xl={12}>
+                            <Form.Item
+                                label="Diễn viên"
+                                name="stars"
+                                style={{ marginBottom: 15 }}
+                            >
+                                <Select
+                                    mode="multiple"
+                                    allowClear
+                                    style={{
+                                        width: '100%',
+                                    }}
+                                    placeholder="Chọn diễn viên"
+                                    onChange={changeStar}
+                                >
                                     {person.map((p, index) => (
                                         <Option key={index} value={p.person_id}>{p.name}</Option>
                                     ))}
-                            </Select>
-                        </Form.Item>
-                        <Form.Item
-                            label="Đạo diễn"
-                            name="directors"
-                            style={{ marginBottom: 15 }}
-                        >
-                            <Select
-                                mode="multiple"
-                                allowClear
-                                style={{
-                                    width: '100%',
-                                }}
-                                placeholder="Chọn đạo diễn"
-                                onChange={changeDirector}
+                                </Select>
+                            </Form.Item>
+                            <Form.Item
+                                label="Đạo diễn"
+                                name="directors"
+                                style={{ marginBottom: 15 }}
+                            >
+                                <Select
+                                    mode="multiple"
+                                    allowClear
+                                    style={{
+                                        width: '100%',
+                                    }}
+                                    placeholder="Chọn đạo diễn"
+                                    onChange={changeDirector}
                                 >
-                                {person.map((p, index) => (
-                                    <Option key={index} value={p.person_id}>{p.name}</Option>
-                                ))}
-                            </Select>
-                        </Form.Item>     
-                        <Form.Item
-                            wrapperCol={{
-                            offset: 6,
-                            }}
-                        >
-                            <Button type="primary" onClick={updatePerson} loading={btnLoading} style={{marginRight: '16px'}}>Lưu</Button>
-                        </Form.Item>   
-                </Col>
-              </Row>
-            </Form>
-        </div>
+                                    {person.map((p, index) => (
+                                        <Option key={index} value={p.person_id}>{p.name}</Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                            <Form.Item
+                                wrapperCol={{
+                                    offset: 6,
+                                }}
+                            >
+                                <Button type="primary" onClick={updatePerson} loading={btnLoading} style={{ marginRight: '16px' }}>Lưu</Button>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                </Form>
+            </div>
         </>
     )
 }

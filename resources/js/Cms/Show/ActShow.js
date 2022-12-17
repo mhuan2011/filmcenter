@@ -2,12 +2,9 @@ import { RollbackOutlined, SaveOutlined, UploadOutlined } from '@ant-design/icon
 import { Breadcrumb, Button, Card, Col, DatePicker, Form, Image, Input, InputNumber, Row, Select, Spin, TimePicker, Upload } from 'antd';
 import moment from 'moment';
 import React, { useContext, useEffect, useState } from 'react';
-import ReactQuill from 'react-quill';
 import { useNavigate, useParams } from 'react-router-dom';
 import { openNotification } from '../../Client/Helper/Notification';
 import { AppContext } from '../../Context';
-import 'react-quill/dist/quill.snow.css';
-import TextEditor from '../Helper/TextEditor';
 
 const initialValues = {
   category: 1,

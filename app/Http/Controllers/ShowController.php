@@ -124,7 +124,7 @@ class ShowController extends Controller
                 $seat = Seat::where('cinema_hall_id',  $new->cinema_hall_id)->get('id');
                 $show_seat = [];
                 foreach ($seat as $item) {
-                    array_push($show_seat, ['seat_id' => $item->id, 'status' => 0, 'price' => 80000, 'show_id' => $new->id]);
+                    array_push($show_seat, ['seat_id' => $item->id, 'status' => 0, 'show_id' => $new->id]);
                 }
 
                 foreach ($show_seat as $key => $value) {

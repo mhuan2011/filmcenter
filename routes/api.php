@@ -11,6 +11,7 @@ use App\Http\Controllers\NotiController;
 use App\Http\Controllers\PaymenController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PersonController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ShowController;
@@ -100,6 +101,11 @@ Route::group(['middleware' => ['auth:api', 'role:admin|staff']], function () {
         Route::post('/update', [ShowController::class, 'update']);
         Route::get('/delete/{id}', [ShowController::class, 'delete']);
     });
+
+    Route::group(['prefix' => 'report'], function () {
+        Route::post('/movies', [ReportController::class, 'movies']);
+        Route::post('/cinema', [ReportController::class, 'cinema']);
+    });
 });
 
 
@@ -169,7 +175,10 @@ Route::post('/cancle-reservation', [ReservationController::class, 'cancleReserva
 Route::post('/tranfer-ticket', [ClientController::class, 'tranferTicket'])->middleware('auth:sanctum');
 
 
-Route::get('/noti', [NotiController::class, 'index']);
 
 Route::post('/show/getseatmap', [ShowController::class, 'getSeatMap']);
 Route::get('/cinema-hall/getlist', [CinemaHallController::class, 'getlist']);
+
+
+
+Route::get('/noti', [NotiController::class, 'index']);

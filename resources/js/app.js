@@ -41,6 +41,7 @@ import ActRole from './Cms/User/Role/ActRole';
 import Permission from './Cms/User/Permisson';
 import ActPermission from './Cms/User/Permission/ActPermission';
 import History from './Client/History/History';
+import Report from './Cms/Report/Report';
 
 
 function App() {
@@ -103,6 +104,7 @@ function App() {
           <Route path='permission' element={<Permission />} />
           <Route path='permission/detail' element={<ActPermission />} />
           <Route path='permission/detail/:id' element={<ActPermission />} />
+          <Route path='report' element={<Report />} />
         </Route>
       </Routes>
     </div>

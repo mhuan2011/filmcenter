@@ -382,7 +382,16 @@ const Provider = ({ children }) => {
       return axios.get(`/api/permission/getitem/${id}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
     updatePermission: (values) => {
-      return axios.post('/api/permission/update', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+
+    },
+
+    // report
+    getReportByFilm: (id) => {
+      return axios.post('/api/report/movies', id, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+    getReportCinema: (values) => {
+      return axios.post('/api/report/cinema', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
 
     getParams: () => {

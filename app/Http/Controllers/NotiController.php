@@ -14,8 +14,6 @@ class NotiController extends Controller
     {
         try {
             event(new NotificationReservation('hello world'));
-
-            event(new PusherEvent('Someone'));
             return response()->json(
                 [
                     "status" => "ok",

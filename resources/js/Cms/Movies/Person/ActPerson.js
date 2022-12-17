@@ -2,11 +2,9 @@ import { RollbackOutlined, SaveOutlined, UploadOutlined } from '@ant-design/icon
 import { Breadcrumb, Button, Card, Col, DatePicker, Form, Image, Input, InputNumber, Row, Select, Spin, Upload } from 'antd';
 import moment from 'moment';
 import React, { useContext, useEffect, useState } from 'react';
-import ReactQuill from 'react-quill';
 import { useNavigate, useParams } from 'react-router-dom';
-import { openNotification } from '../../../Client/Helper/Notification'; 
+import { openNotification } from '../../../Client/Helper/Notification';
 import { AppContext } from '../../../Context';
-import 'react-quill/dist/quill.snow.css';
 import TextEditor from '../../Helper/TextEditor';
 
 const initialValues = {
@@ -129,14 +127,14 @@ const ActPerson = () => {
                     rules={[{ required: true, message: 'Please Input' }]}
                   >
                     <Input placeholder="Please Input" />
-                  </Form.Item>        
+                  </Form.Item>
                   <Form.Item
                     label="Sinh nhật"
                     name="date_of_birth"
                     style={{ marginBottom: 15 }}
                     rules={[{ required: true, message: 'Please Input' }]}
                   >
-                    <DatePicker  format={dateFormat} />
+                    <DatePicker format={dateFormat} />
                   </Form.Item>
                   <Form.Item
                     label="Giới tính"
@@ -159,10 +157,10 @@ const ActPerson = () => {
                   >
                     {/* <TextArea rows={5} placeholder="Please Input" /> */}
                     {/* <ReactQuill theme="snow" value={value} onChange={setValue}/> */}
-                    <TextEditor style={{height: '200px'}}/>
+                    <TextEditor style={{ height: '200px' }} />
                   </Form.Item>
                 </Col>
-                
+
                 <Col xs={24} xl={12}>
                   {pic &&
                     <Form.Item

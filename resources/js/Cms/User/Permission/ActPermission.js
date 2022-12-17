@@ -4,7 +4,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { openNotification } from '../../../Client/Helper/Notification';
 import { AppContext } from '../../../Context';
-import 'react-quill/dist/quill.snow.css';
 
 
 const layout = {
