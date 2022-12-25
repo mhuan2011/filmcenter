@@ -1,14 +1,21 @@
 import { Spin } from 'antd';
 import React, { useContext, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { AppContext } from './Context'; 
+import { AppContext } from './Context';
+import { openNotification } from './Client/Helper/Notification';
 
 const Logout = () => {
-  const { setUser } = useContext(AppContext);
+  const { setUser, logout } = useContext(AppContext);
   let navigate = useNavigate();
   useEffect(() => {
-    localStorage.removeItem("user");
-    setUser({ role_id: null });
+    logout().then((response) => {
+      setUser({ role_id: null });
+
+      localStorage.removeItem("user");
+      openNotification(response.data);
+    })
+      .catch((error) => {
+      });
     navigate("/");
   }, [])
 

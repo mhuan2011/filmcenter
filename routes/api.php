@@ -40,6 +40,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+Route::middleware('auth:sanctum')->get('/logout', [AuthController::class, 'logout']);
+
 
 Route::group(['middleware' => ['auth:api', 'role:admin|staff'], 'prefix' => 'category'], function () {
     //Categories
@@ -52,12 +54,18 @@ Route::group(['middleware' => ['auth:api', 'role:admin|staff'], 'prefix' => 'cat
 });
 
 
+
+
 Route::group(['middleware' => ['auth:api', 'role:admin|staff'], 'prefix' => 'user'], function () {
-    Route::post('/update', [AuthController::class, 'update']);
     Route::post('/create', [UserController::class, 'creatAccount']);
     Route::post('/detail', [UserController::class, 'getAccountDetail']);
     Route::post('/update-account', [UserController::class, 'updateAccount']);
 });
+
+Route::group(['middleware' => ['auth:api', 'role:admin|staff|customer'], 'prefix' => 'user'], function () {
+    Route::post('/update', [AuthController::class, 'update']);
+});
+
 
 
 
@@ -93,7 +101,7 @@ Route::group(['middleware' => ['auth:api', 'role:admin|staff']], function () {
     });
 
     Route::group(['prefix' => 'show'], function () {
-        Route::get('/getlist', [ShowController::class, 'getlist']);
+
         Route::post('/getlist/ticket', [ShowController::class, 'getlistTicket']);
 
         Route::get('/getitem/{id}', [ShowController::class, 'getitem']);
@@ -105,6 +113,8 @@ Route::group(['middleware' => ['auth:api', 'role:admin|staff']], function () {
     Route::group(['prefix' => 'report'], function () {
         Route::post('/movies', [ReportController::class, 'movies']);
         Route::post('/cinema', [ReportController::class, 'cinema']);
+        Route::post('/detail', [ReportController::class, 'detail']);
+        Route::post('/show', [ReportController::class, 'show']);
     });
 });
 
@@ -178,7 +188,15 @@ Route::post('/tranfer-ticket', [ClientController::class, 'tranferTicket'])->midd
 
 Route::post('/show/getseatmap', [ShowController::class, 'getSeatMap']);
 Route::get('/cinema-hall/getlist', [CinemaHallController::class, 'getlist']);
-
+Route::get('/cinema-hall/getlist-active', [CinemaHallController::class, 'getlistActive']);
 
 
 Route::get('/noti', [NotiController::class, 'index']);
+Route::post('/show/getlist', [ShowController::class, 'getlist']);
+
+
+
+
+// demo
+Route::get('/check-expire', [NotiController::class, 'check']);
+Route::get('/check-cancle', [NotiController::class, 'cancle']);

@@ -49,11 +49,12 @@ const initchartData = {
     }
   },
 };
+
 const Dashboard = () => {
   const { user, statisticByDate, revenueByDate } = useContext(AppContext);
   const [data, setData] = useState({
-    time_start: new Date(),
-    time_end: new Date() + 30,
+    time_start: moment(new Date(date.getFullYear(), date.getMonth(), 1), dateFormat),
+    time_end: moment(new Date(date.getFullYear(), date.getMonth() + 1, 0), dateFormat),
     store_id: user ? user.store_id : 0,
   });
 
@@ -74,8 +75,7 @@ const Dashboard = () => {
   const [rawData, setRawData] = useState();
   const [chartData, setChartData] = useState(initchartData);
 
-  useEffect(() => {
-  }, [])
+
 
   useEffect(() => {
     if (data) {

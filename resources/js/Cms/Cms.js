@@ -154,17 +154,20 @@ const Cms = () => {
             </Menu.Item>
           </SubMenu> : null}
 
-          <SubMenu
-            key="report-builder"
-            icon={<ProfileOutlined />}
-            title="Report"
-          >
-            <Menu.Item key="report">
-              <Link to="/admin/report">Báo cáo chi tiết</Link>
-            </Menu.Item>
-          </SubMenu>
+          {user.role_id == 1 && <>
+            <SubMenu
+              key="report-builder"
+              icon={<ProfileOutlined />}
+              title="Report"
+            >
+              <Menu.Item key="report">
+                <Link to="/admin/report">Báo cáo chi tiết</Link>
+              </Menu.Item>
+            </SubMenu>
+          </>}
 
-          {user.role_id == 1 || user.role_id == 2 ? <SubMenu
+
+          {user.role_id == 1 ? <SubMenu
             key="user"
             icon={<UserOutlined />}
             title="User"

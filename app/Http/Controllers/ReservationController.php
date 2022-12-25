@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\checkExpirePayment;
 use App\Jobs\CheckReservation;
 use App\Mail\Reservation as MailReservation;
 use App\Models\Reservation;
@@ -54,7 +55,6 @@ class ReservationController extends Controller
                         $res = ShowSeat::where('id', $seat)->update(['reservation_id' => $unique_code, 'status' => 1]);
                     }
                 }
-
                 if ($is_pay) {
                     CheckReservation::dispatch($unique_code, $seats)->delay(Carbon::now('Asia/Ho_Chi_Minh')->addSeconds(600));
                 }
@@ -75,6 +75,8 @@ class ReservationController extends Controller
         }
     }
 
+
+
     // huy ve
     public function cancleReservation(Request $request)
     {
@@ -82,6 +84,7 @@ class ReservationController extends Controller
         $id = isset($data['resevation_id']) ? $data['resevation_id'] : "";
         if ($id) {
             $show_id = ShowSeat::where("reservation_id", $id)->first()->show_id;
+
             if ($show_id) {
                 $show  = Show::where("id", $show_id)->first();
 
@@ -104,6 +107,7 @@ class ReservationController extends Controller
                                 'message' => "Không thể hủy vé đã thanh toán !"
                             ]);
                         }
+                        break;
                     case 2: {
                             return response()->json([
                                 'status' => false,
@@ -111,17 +115,24 @@ class ReservationController extends Controller
                                 'code' => 1
                             ]);
                         }
+                        break;
                 }
 
-
                 /* Ngày chiếu là ngày hiện tại */
+
                 if ($date == $date_now) {
                     $time = $finishTime->diffInHours($start);
                     /* Nếu thời gian hiện tại trong khoảng 1h trước giờ chiếu */
+
                     if ($time < 1) {
                         return response()->json([
                             'status' => false,
                             'message' => "Không thể hủy vé trong trước thời gian chiếu 1 giờ !"
+                        ]);
+                    } else {
+                        return response()->json([
+                            'status' => false,
+                            'message' => "Ngoài thời gian xử lý !"
                         ]);
                     }
                 } else {
@@ -154,7 +165,9 @@ class ReservationController extends Controller
             $status = $reserve->status;
             if ($status == "Thanh toán") return 1;
             if ($status == "Đã hủy") return 2;
+            return 3;
         } else {
+            dd(1);
             return 3;
         }
     }

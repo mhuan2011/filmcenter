@@ -42,7 +42,12 @@ const MoviesCategory = () => {
       dataIndex: 'description',
       key: 'description',
     },
-
+    // {
+    //   title: 'Status',
+    //   dataIndex: 'status',
+    //   key: 'status',
+    //   width: 100,
+    // },
     {
       title: 'Action',
       key: 'action',

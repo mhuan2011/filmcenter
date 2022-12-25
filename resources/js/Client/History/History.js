@@ -56,11 +56,20 @@ const History = () => {
             dataIndex: 'status',
             render: (_, { status }) => {
                 let curent = status == "Chưa thanh toán" ? 1 : status == "Đã hủy" ? 1 : 2;
+                var s = status;
+                if (status == "Hết hạn") curent = 1;
+
                 let descriptionTep2 = status == "Đã hủy" ? "Vé đã hủy" : "Chờ thanh toán";
                 if (status == "Thanh toán") {
                     descriptionTep2 = "Thanh toán thành công"
                 }
-                status = status == "Đã hủy" ? "error" : "process"
+                if (status == "Hết hạn") {
+                    descriptionTep2 = "Vé hết hạn"
+                }
+                if (status == "Hết hạn" || status == "Đã hủy") status = "error"
+                else status = "process";
+
+
 
                 return (
                     <Steps
@@ -74,7 +83,7 @@ const History = () => {
                                 description: 'Đặt vé thành công',
                             },
                             {
-                                title: 'Thanh toán',
+                                title: s,
                                 description: descriptionTep2,
                             },
                             {

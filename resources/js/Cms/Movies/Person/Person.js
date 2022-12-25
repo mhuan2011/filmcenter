@@ -4,25 +4,25 @@ import moment from 'moment';
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { openNotification } from '../../../Client/Helper/Notification';
-import { AppContext } from '../../../Context'; 
+import { AppContext } from '../../../Context';
 import ActPerson from './ActPerson';
 
 const Person = () => {
   let navigate = useNavigate();
-  const {getListPerson, deletePerson } = useContext(AppContext);
+  const { getListPerson, deletePerson } = useContext(AppContext);
   const [data, setData] = useState();
   const [loadingTable, setLoadingTable] = useState(true);
   const [visible, setvisible] = useState(false);
   const [refresh, setRefresh] = useState(null);
   const [keyID, setKeyID] = useState(null);
-  
+
 
   useEffect(() => {
     getListPerson().then((response) => {
       setData(response.data.data);
       setLoadingTable(false)
     })
-    
+
   }, [refresh])
   const columns = [
     {
@@ -39,8 +39,8 @@ const Person = () => {
       render: pic => {
         return (
           <Image
-          width={100}
-          src={APP_URL + '/images' + pic}
+            width={100}
+            src={APP_URL + '/images' + pic}
           />
         )
       }
@@ -50,7 +50,7 @@ const Person = () => {
       dataIndex: 'name',
       key: 'name',
       width: 100,
-      
+
     },
     {
       title: 'Ngày sinh',
@@ -70,7 +70,7 @@ const Person = () => {
       width: 100,
       render: (gender) => {
         return (
-          <div style={{textAlign: 'center'}}>{gender ? <WomanOutlined style={{color: '#eb2f96', fontSize: '20px'}} /> : <ManOutlined  style={{color: '#52c41a', fontSize: '20px'}}  />}</div>
+          <div style={{ textAlign: 'center' }}>{gender ? <WomanOutlined style={{ color: '#eb2f96', fontSize: '20px' }} /> : <ManOutlined style={{ color: '#52c41a', fontSize: '20px' }} />}</div>
         )
       }
     },
@@ -79,13 +79,13 @@ const Person = () => {
       dataIndex: 'description',
       key: 'description',
       render: (description) => {
-        
+
         return (
-          <div dangerouslySetInnerHTML={{__html: description}}></div>
+          <div dangerouslySetInnerHTML={{ __html: description }}></div>
         )
       }
     },
-    
+
     {
       title: 'Action',
       key: 'action',
@@ -106,16 +106,16 @@ const Person = () => {
   }
   const remove = (record) => {
     setLoadingTable(true)
-    deletePerson(record.id).then((res) => {
+    deletePerson(record.person_id).then((res) => {
       let newItems = data.filter(item => item.id !== record.id)
       setData(newItems)
       openNotification(res.data);
       setLoadingTable(false)
     })
   }
-  const openDraw = () =>{
+  const openDraw = () => {
     setvisible(true);
-}
+  }
   return (
     <>
       <Breadcrumb style={{ margin: '16px 0' }}>

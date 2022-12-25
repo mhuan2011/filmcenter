@@ -36,10 +36,12 @@ class AuthController extends Controller
             $user->phone = $request['phone'];
             $user->password = Hash::make($request['password']);
             $user->address = isset($request['address']) ? $request['address'] : "";
-            $user->role_id = 1;
+            $user->role_id = 3;
 
             $result = $user->save();
 
+
+            $user->assignRole(3);
             // $user = User::create([
             //     'name' => $request['name'],
             //     'email' => isset($request['email']) ? $request['email'] : "",
@@ -59,7 +61,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'status' => true,
-                'message' => 'Register successfully.',
+                'message' => 'Đăng ký tài khoản thành công.',
                 'data' => [
                     // 'access_token' => $token,
                     'token_type' => 'Bearer',
@@ -78,7 +80,7 @@ class AuthController extends Controller
             if (!Auth::attempt(["phone" => $request['username'], "password" => $request['password']])) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Wrong username/phone number or password.'
+                    'message' => 'Sai tên đăng nhập hoặc mật khẩu.'
                 ]);
             }
         }
@@ -113,16 +115,25 @@ class AuthController extends Controller
             'data' => [
                 'user' => $user,
             ],
-            'message' => 'Update info successfully! Please login again!',
+            'message' => 'Cập nhật thông tin thành công! Vui lòng đăng nhập lại!',
         ]);
     }
 
     public function logout()
     {
         /** @var \App\Models\User */
-        auth()->user()->currentAccessToken()->delete();
+        $user = Auth::user();
+        // Revoke current user token
+        // dd(Auth::user());
+        $user->access_token = "";
+        $user->api_token = "";
+
+        $user->update();
+        $user->tokens()->where('id', $user->currentAccessToken()->id)->delete();
+
         return response([
-            'message' => 'Successfully Logged Out!'
+            'message' => 'Đăng xuất thành công!',
+            'data' => $user->tokens()->where('id', $user->currentAccessToken()->id)
         ]);
     }
 }

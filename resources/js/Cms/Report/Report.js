@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { openNotification } from '../../Client/Helper/Notification';
 import { AppContext } from '../../Context';
 import ReportCinema from './components/ReportCinema';
+import ReportDetail from './components/ReportDetail';
 import ReportFilm from './components/ReportFilm';
 const { Paragraph, Text } = Typography;
 const Report = () => {
@@ -32,9 +33,9 @@ const Report = () => {
                             children: <ReportCinema />,
                         },
                         {
-                            label: 'Tổng doanh thu',
+                            label: 'Báo cáo chi tiết',
                             key: '3',
-                            children: 'Tab 3',
+                            children: <ReportDetail />,
                         },
                     ]}
                 />

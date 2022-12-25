@@ -116,7 +116,9 @@ const Provider = ({ children }) => {
       dispatch({ type: actions.SUM_MONEY });
     },
 
-
+    logout: () => {
+      return axios.get(`/api/logout`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
     //category
     getItemCategory: (keyID) => {
       return axios.get(`/api/category/getitem/${keyID}`, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
@@ -150,8 +152,8 @@ const Provider = ({ children }) => {
     updatePerson: (values) => {
       return axios.post(`/api/person/update`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
-    deletePerson: () => {
-      return axios.get('/api/person/delete/{id}', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    deletePerson: (id) => {
+      return axios.get('/api/person/delete/' + id, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
 
     // 
@@ -188,6 +190,9 @@ const Provider = ({ children }) => {
     getListCinemalHall: () => {
       return axios.get('/api/cinema-hall/getlist', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
+    getListCinemalHallActive: () => {
+      return axios.get('/api/cinema-hall/getlist-active', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
     storeCinemalHall: (values) => {
       return axios.post('/api/cinema-hall/store', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
@@ -208,8 +213,8 @@ const Provider = ({ children }) => {
     getSeatMap: (values) => {
       return axios.post(`/api/show/getseatmap`, values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
-    getListShow: () => {
-      return axios.get('/api/show/getlist', { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    getListShow: (values) => {
+      return axios.post('/api/show/getlist', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
     storeShow: (values) => {
       return axios.post('/api/show/store', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
@@ -393,6 +398,17 @@ const Provider = ({ children }) => {
     getReportCinema: (values) => {
       return axios.post('/api/report/cinema', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
     },
+
+
+    ReportDetail: (values) => {
+      return axios.post('/api/report/detail', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
+
+    getReportWithShow: (values) => {
+      return axios.post('/api/report/show', values, { headers: { "Authorization": `Bearer ${state.user.access_token}` } })
+    },
+
 
     getParams: () => {
       var url = window.location.href;

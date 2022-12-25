@@ -5,10 +5,11 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { openNotification } from '../../../Client/Helper/Notification';
 import { AppContext } from '../../../Context';
+import helper from '../../Helper/helper';
 const { Paragraph, Text } = Typography;
 const ReportFilm = () => {
     let navigate = useNavigate();
-    const { getReportByFilm, getListMovies, getMovies } = useContext(AppContext);
+    const { getReportByFilm, getListMovies, getMovies, getReportWithShow } = useContext(AppContext);
     const [movies, setMovies] = useState([]);
     const [movieId, setMovieId] = useState("");
 
@@ -16,6 +17,7 @@ const ReportFilm = () => {
     const [totalShow, setTotalShow] = useState(0);
     const [movie, setMovie] = useState({});
     const [rate, setRate] = useState(0);
+    const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -29,6 +31,8 @@ const ReportFilm = () => {
             })
             setMovies(m);
         })
+
+
     }, [])
 
     useEffect(() => {
@@ -38,7 +42,14 @@ const ReportFilm = () => {
             getMovies(movieId).then(res => {
                 setMovie(res.data.data)
             })
+
+
+            getReportWithShow({ id: movieId }).then((res) => {
+                setData(res.data.data);
+            })
         }
+
+
     }, [movieId])
 
     const getReport = (movie_id) => {
@@ -62,6 +73,54 @@ const ReportFilm = () => {
         var url = APP_URL + '/images/movies' + image;
         return url;
     }
+
+    const columns = [
+        {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+            width: 50,
+        },
+        {
+            title: 'Ngày chiếu',
+            dataIndex: 'date',
+            key: 'date',
+            width: 150,
+        },
+        {
+            title: 'Ngày bắt đầu',
+            dataIndex: 'start_time',
+            key: 'start_time',
+            width: 150,
+        },
+        {
+            title: 'Ngày kết thúc',
+            dataIndex: 'end_time',
+            key: 'end_time',
+        },
+        {
+            title: 'Tổng vé',
+            dataIndex: 'total_ticket',
+            key: 'total_ticket',
+            width: 150,
+        },
+        {
+            title: 'Đã bán',
+            dataIndex: 'solve_ticket',
+            key: 'solve_ticket',
+            width: 150,
+        },
+        {
+            title: 'Doanh thu',
+            dataIndex: 'total',
+            key: 'total',
+            width: 150,
+            render: total => (
+                <>{helper.formatCurrency(total)}</>
+            )
+        },
+
+    ];
 
     return (
         <>
@@ -146,6 +205,12 @@ const ReportFilm = () => {
                         </Row>
                     </Col>
                 </Row>
+
+                <Table
+                    columns={columns}
+                    dataSource={data}
+                    rowKey={'id'}
+                />
             </Spin>
         </>
     )

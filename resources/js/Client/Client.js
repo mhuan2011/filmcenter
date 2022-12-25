@@ -24,7 +24,7 @@ const Client = () => {
   }, [])
 
   useEffect(() => {
-    Pusher.logToConsole = true;
+    // Pusher.logToConsole = true;
     var pusher = new Pusher(process.env.MIX_PUSHER_APP_KEY, {
       cluster: process.env.MIX_PUSHER_APP_CLUSTER
     });
@@ -53,10 +53,10 @@ const Client = () => {
       key: 'about-us',
       label: <Link to='/about-us'>Giới thiệu</Link>,
     },
-    user ? {
-      key: 'history',
-      label: <Link to='/history'>Lịch sử</Link>,
-    } : {}
+    // user.role_id != "" ? {
+    //   key: 'history',
+    //   label: <Link to='/history'>Lịch sử</Link>,
+    // } : {}
 
   ];
 

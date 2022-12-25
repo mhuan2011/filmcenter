@@ -18,7 +18,7 @@ const formItemLayout = {
 const { Search, TextArea } = Input;
 const dateFormat = 'YYYY/MM/DD';
 const ActShow = () => {
-  const { getShow, storeShow, updateShow, getListMovies, getListCinemalHall } = useContext(AppContext);
+  const { getShow, storeShow, updateShow, getListMovies, getListCinemalHallActive } = useContext(AppContext);
 
   let navigate = useNavigate();
   const params = useParams();
@@ -30,6 +30,9 @@ const ActShow = () => {
   const [cinemaHall, setCinameHall] = useState([]);
   const [startTime, setStartTime] = useState(null);
 
+  const disabledDate = (current) => {
+    return current && current < moment().subtract(1, 'days');
+  };
 
 
   const operations = <>
@@ -45,10 +48,27 @@ const ActShow = () => {
     getListMovies().then((res) => {
       setMovies(res.data.data);
     });
-    getListCinemalHall().then((res) => {
+    getListCinemalHallActive().then((res) => {
       setCinameHall(res.data.data);
     });
   }, [])
+
+  const getDisabledHours = () => {
+    var hours = [];
+    for (var i = 0; i < moment().hour(); i++) {
+      hours.push(i);
+    }
+    return hours;
+  }
+  const getDisabledMinutes = (selectedHour) => {
+    var minutes = [];
+    if (selectedHour === moment().hour()) {
+      for (var i = 0; i < moment().minute(); i++) {
+        minutes.push(i);
+      }
+    }
+    return minutes;
+  }
 
   useEffect(() => {
     if (params.id) {
@@ -67,9 +87,10 @@ const ActShow = () => {
     }
   }, []);
 
+
   const onSubmit = () => {
     form.validateFields().then((values) => {
-      setLoadingForm(true)
+      // setLoadingForm(true)
       const formData = new FormData();
       if (params.id) formData.append("id", params.id)
       if (values.date) formData.append("date", moment(values.date).format('YYYY-MM-DD'))
@@ -84,14 +105,14 @@ const ActShow = () => {
         updateShow(formData).then(function (res) {
           setLoadingForm(false)
           openNotification(res.data);
-          navigate("/admin/show")
+          // navigate("/admin/show")
         })
       } else {
         //store
         storeShow(formData).then(function (res) {
           setLoadingForm(false)
           openNotification(res.data);
-          navigate("/admin/show")
+          // navigate("/admin/show")
         })
       }
     })
@@ -138,7 +159,7 @@ const ActShow = () => {
                     style={{ marginBottom: 15 }}
                     rules={[{ required: true, message: 'Please Input name' }]}
                   >
-                    <DatePicker />
+                    <DatePicker disabledDate={disabledDate} />
                   </Form.Item>
                   <Form.Item
                     label="Thời gian bắt đầu"
@@ -146,7 +167,8 @@ const ActShow = () => {
                     style={{ marginBottom: 15 }}
                     rules={[{ required: true, message: 'Please Input duration' }]}
                   >
-                    <TimePicker />
+                    <TimePicker
+                    />
 
                   </Form.Item>
                   <Form.Item

@@ -1,23 +1,59 @@
 import { BarcodeOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Image, Popconfirm, Space, Table, Tag } from 'antd';
+import { Breadcrumb, Button, Col, DatePicker, Image, Input, Popconfirm, Row, Space, Table, Tag } from 'antd';
+import moment from 'moment';
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { openNotification } from '../../Client/Helper/Notification'; 
-import { AppContext } from '../../Context'; 
+import { openNotification } from '../../Client/Helper/Notification';
+import { AppContext } from '../../Context';
+
+
+const dateFormat = 'YYYY-MM-DD';
+const { RangePicker } = DatePicker;
+const date = new Date();
+
+const { Search } = Input;
+const initialValues =
+  [(moment().day(1)), (moment().day(7))];
 
 const Show = () => {
   let navigate = useNavigate();
-  const { getListShow, deleteShow } = useContext(AppContext);
+  const { getListShow, deleteShow, getListCinemalHallActive } = useContext(AppContext);
   const [data, setData] = useState();
   const [loadingTable, setLoadingTable] = useState(true);
-  const [categories, setCategories] = useState([])
+  const [filter, setFilter] = useState({});
+  const [dateRange, setDateRange] = useState(initialValues);
+  const [cinemaHall, setCinameHall] = useState([]);
+  const [keySearch, setKeySearch] = useState("");
+
   useEffect(() => {
-    getListShow ().then((res) => {
+    getListCinemalHallActive().then(res => {
+      var p = [];
+      res.data.data.forEach(element => {
+        p.push({
+          text: element.name,
+          value: element.id,
+        })
+      });
+      setCinameHall(p);
+    })
+  }, [])
+
+  useEffect(() => {
+    var values = {};
+    if (dateRange) {
+      values.start_date = moment(dateRange[0]).format(dateFormat);
+      values.end_date = moment(dateRange[1]).format(dateFormat);
+    }
+    if (keySearch) values.key_search = keySearch;
+    setLoadingTable(true);
+    getListShow({ ...values, ...filter }).then((res) => {
       setData(res.data.data);
       setLoadingTable(false)
     });
-    
-  }, [])
+  }, [dateRange, keySearch])
+
+
+
   const columns = [
     {
       title: 'ID',
@@ -36,25 +72,26 @@ const Show = () => {
       key: 'start_time',
     },
     {
-        title: 'Thời gian kết thúc',
-        dataIndex: 'end_time',
-        key: 'end_time',
+      title: 'Thời gian kết thúc',
+      dataIndex: 'end_time',
+      key: 'end_time',
     },
     {
-        title: 'Phim',
-        dataIndex: 'movie_id',
-        key: 'movie_id',
-        render: (_, record) =>  (
-          <>{record.movies.title}</>
-        )
+      title: 'Phim',
+      dataIndex: 'movie_id',
+      key: 'movie_id',
+      render: (_, record) => (
+        <>{record.movies.title}</>
+      )
     },
     {
-        title: 'Rạp',
-        dataIndex: 'cinema_hall_id',
-        key: 'cinema_hall_id',
-        render: (_, record) => (
-          <>{record.cinema_hall.name}</>
-        )
+      title: 'Rạp',
+      dataIndex: 'cinema_hall_id',
+      key: 'cinema_hall_id',
+      filters: cinemaHall,
+      render: (_, record) => (
+        <>{record.cinema_hall.name}</>
+      )
     },
     {
       title: 'Ticket list',
@@ -62,7 +99,7 @@ const Show = () => {
       width: 100,
       fixed: 'right',
       render: (text, record) => (
-        <Link to={'/admin/show/ticket?show_id='+record.id}> <BarcodeOutlined /> Details</Link>
+        <Link to={'/admin/show/ticket?show_id=' + record.id}> <BarcodeOutlined /> Chi tiết</Link>
       ),
     },
     {
@@ -92,6 +129,41 @@ const Show = () => {
       setLoadingTable(false)
     })
   }
+
+  const getThisMonth = () => {
+    var date = new Date();
+    var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+    var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    setDateRange([moment(firstDay, dateFormat), moment(lastDay, dateFormat)]);
+  }
+
+
+  const handleTableChange = (pagination, filters, sorter) => {
+    setFilter(filters);
+    getListShows(filters);
+  };
+
+  const onChangeDate = (dates, dateStrings) => {
+    setDateRange([dates[0], dates[1]]);
+  };
+
+  const getListShows = (filters) => {
+    var values = {};
+    if (dateRange) {
+      values.start_date = moment(dateRange[0]).format(dateFormat);
+      values.end_date = moment(dateRange[1]).format(dateFormat);
+    }
+
+    if (keySearch) values.key_search = keySearch;
+    setLoadingTable(true);
+    getListShow({ ...values, ...filters }).then((res) => {
+      setData(res.data.data);
+      setLoadingTable(false)
+    });
+  }
+
+
+  const onSearch = (value) => setKeySearch(value);
   return (
     <>
       <Breadcrumb style={{ margin: '16px 0' }}>
@@ -99,7 +171,27 @@ const Show = () => {
         <Breadcrumb.Item>Danh sách rạp</Breadcrumb.Item>
       </Breadcrumb>
       <div className="site-layout-background" style={{ padding: 16, minHeight: 480 }}>
-        <Button type='primary' style={{ marginBottom: '16px' }}><Link to="/admin/show/detail?action=add">Thêm lịch chiếu</Link></Button>
+        <Row gutter={8}>
+          <Col span={8}><Button type='primary' style={{ marginBottom: '16px' }}><Link to="/admin/show/detail?action=add">Thêm lịch chiếu</Link></Button></Col>
+
+          <Col span={8}>
+            <RangePicker
+              value={dateRange}
+              onChange={onChangeDate}
+              format={dateFormat}
+              allowClear={false}
+              // renderExtraFooter={footerPicker}
+              ranges={{
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Today': [moment(), moment()],
+                'This Week': [(moment().day(1)), (moment().day(7))],
+                'This Month': [moment().startOf('month'), moment()],
+              }}
+            />
+          </Col>
+          <Col span={8}><Search placeholder="Tìm kiếm với mã đặt vé" onSearch={onSearch} enterButton /></Col>
+        </Row>
+
         <Table
           bordered
           scroll={{ x: 980 }}
@@ -107,6 +199,7 @@ const Show = () => {
           dataSource={data}
           rowKey='id'
           loading={loadingTable}
+          onChange={handleTableChange}
         />
       </div>
     </>

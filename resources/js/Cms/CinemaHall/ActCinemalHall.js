@@ -1,5 +1,5 @@
 import { RollbackOutlined, SaveOutlined, UploadOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Card, Col, DatePicker, Form, Image, Input, InputNumber, Row, Select, Spin, Upload } from 'antd';
+import { Breadcrumb, Button, Card, Col, DatePicker, Form, Image, Input, InputNumber, Row, Select, Spin, Switch, Upload } from 'antd';
 import moment from 'moment';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -9,6 +9,7 @@ import SeatMap from './SeatMap';
 
 const initialValues = {
   category: 1,
+  status: 1,
   totalSeat: "0",
 }
 
@@ -62,7 +63,7 @@ const ActCinemalHall = () => {
       const formData = new FormData();
       if (params.id) formData.append("id", params.id)
       if (values.name) formData.append("name", values.name)
-
+      formData.append("status", values.status ? 1 : 0)
       if (values.total_seat) formData.append("total_seat", values.total_seat)
 
       if (params.id) {
@@ -71,7 +72,7 @@ const ActCinemalHall = () => {
         updateCinemalHall(formData).then(function (res) {
           setLoadingForm(false)
           openNotification(res.data);
-          navigate("/admin/cinema-hall")
+          // navigate("/admin/cinema-hall")
         })
       } else {
         if (values.cinema_id) formData.append("cinema", values.cinema_id)
@@ -79,7 +80,7 @@ const ActCinemalHall = () => {
         storeCinemalHall(formData).then(function (res) {
           setLoadingForm(false)
           openNotification(res.data);
-          navigate("/admin/cinema-hall")
+          // navigate("/admin/cinema-hall")
         })
       }
     })
@@ -127,6 +128,15 @@ const ActCinemalHall = () => {
                     rules={[{ required: true, message: 'Please Input name' }]}
                   >
                     <Input placeholder="Please Input name" />
+                  </Form.Item>
+                  <Form.Item
+                    label="Trạng thái"
+                    name="status"
+                    style={{ marginBottom: 15 }}
+                    rules={[{ required: true, message: 'Please select status' }]}
+                    valuePropName="checked"
+                  >
+                    <Switch />
                   </Form.Item>
                   <Form.Item
                     label="Rạp"

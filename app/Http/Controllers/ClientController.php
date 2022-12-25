@@ -64,26 +64,38 @@ class ClientController extends Controller
             array_push($cinema_hall_id_list, $item->id);
         };
 
-        $date_show = Show::where('movie_id', $movie_id)->where([['start_time', '>', $time], ['date', '=', $date]])->orWhere('date', '>', $date)->whereIn('cinema_hall_id', $cinema_hall_id_list)->groupBy('date')->get('date');
+        $date_show = Show::where('movie_id', $movie_id)
+            ->whereIn('cinema_hall_id', $cinema_hall_id_list)
+            ->where(function ($query) use ($date, $time) {
+                $query->where([['start_time', '>', $time], ['date', '=', $date]])
+                    ->orWhere('date', '>', $date);
+            })
+            ->groupBy('date')->get('date');
+
 
         if (!$date_selected) {
             foreach ($date_show as $d) {
-                $temp = Show::selectRaw('id, cinema_hall_id, start_time')->where([['start_time', '>', $time], ['date', '=', $date]])->orWhere('date', '>', $date)->where('movie_id', $movie_id)->where('date', $d->date)->whereIn('cinema_hall_id', $cinema_hall_id_list)->orderBy('start_time', 'asc')->get();
+                $temp = Show::selectRaw('id, cinema_hall_id, start_time')->where('movie_id', $movie_id)
+                    ->where('date', $d->date)
+                    ->whereIn('cinema_hall_id', $cinema_hall_id_list)->orderBy('start_time', 'asc');
 
+                $temp = $temp
+                    // ->where([['start_time', '>', $time], ['date', '=', $date]])
+                    // ->orWhere('date', '>', $date)
+                    ->get();
                 array_push($data, [
                     'date' => $d->date,
                     'show' => $temp
                 ]);
             };
         } else {
-
             if ($date == $date_selected) {
-                $data = Show::selectRaw('id, cinema_hall_id, start_time')
+                $data = Show::selectRaw('id, cinema_hall_id, start_time')->where('movie_id', $movie_id)
                     ->where([['start_time', '>', $time], ['date', '=', $date]])
                     ->where('date', $date_selected)->whereIn('cinema_hall_id', $cinema_hall_id_list)
                     ->orderBy('start_time', 'asc')->get();
             } else {
-                $data = Show::selectRaw('id, cinema_hall_id, start_time')
+                $data = Show::selectRaw('id, cinema_hall_id, start_time')->where('movie_id', $movie_id)
                     ->where('date', $date_selected)->whereIn('cinema_hall_id', $cinema_hall_id_list)
                     ->orderBy('start_time', 'asc')->get();
             }
@@ -105,10 +117,19 @@ class ClientController extends Controller
         $date_show = Show::where([['start_time', '>', $time], ['date', '=', $date]])->orWhere('date', '>', $date)->groupBy('date')->get('date');
         $data = [];
         foreach ($date_show as $d) {
-            $temp = Show::selectRaw('show.id, cinema.id, cinema.name')->where([['start_time', '>', $time], ['date', '=', $date]])->orWhere('date', '>', $date)->where('date', $d->date)->orderBy('start_time', 'asc');
+            $temp = Show::selectRaw('cinema.id , cinema.name')
+                // ->where([['start_time', '>', $time], ['date', '=', $date]])
+                // ->orWhere('date', '>', $date)->where('date', $d->date)
+                ->where(function ($query) use ($date, $time) {
+                    $query->where([['start_time', '>', $time], ['date', '=', $date]])
+                        ->orWhere('date', '>', $date);
+                })
+                ->orderBy('start_time', 'asc');
 
-            $result = $temp->leftJoin('cinema_hall', 'cinema_hall.id', '=', 'show.cinema_hall_id')
-                ->leftJoin('cinema', 'cinema.id', '=', 'cinema_hall.cinema_id')->get();
+            $result = $temp->join('cinema_hall', 'cinema_hall.id', '=', 'show.cinema_hall_id')
+                ->join('cinema', 'cinema.id', '=', 'cinema_hall.cinema_id')
+                ->groupBy('cinema.id', 'cinema.name')
+                ->get();
             array_push($data, [
                 'date' => $d->date,
                 'cinema' => $result

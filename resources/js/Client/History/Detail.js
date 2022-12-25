@@ -40,6 +40,7 @@ const Detail = ({ item, setOpen, open, setRefresh }) => {
     const [total, setTotal] = useState(0);
     const [date, setDate] = useState(null);
     const [timeList, setTimeList] = useState([]);
+    const [status, setStatus] = useState("Hết hạn");
 
     useEffect(() => {
         if (item.id) {
@@ -64,6 +65,7 @@ const Detail = ({ item, setOpen, open, setRefresh }) => {
                         reserveSeat: []
                     })
                     setSeatNumber(sn);
+                    setStatus(res.data.data.reservation.status)
                 } else {
                     openNotification(res.data);
                     setUser({});
@@ -131,7 +133,7 @@ const Detail = ({ item, setOpen, open, setRefresh }) => {
 
     const action = (record) => {
         let disableTranfer = false, disablePay = false, disableCancle = false;
-        if (record.status == "Đã hủy") {
+        if (record.status == "Đã hủy" || record.status == "Hết hạn") {
             disablePay = true;
             disableCancle = true;
             disableTranfer = true;
@@ -262,6 +264,17 @@ const Detail = ({ item, setOpen, open, setRefresh }) => {
                         <Col></Col>
                         <Col>{action(item)}</Col>
                     </Row>
+                    {status == "Hết hạn" &&
+                        <>
+                            <Alert
+                                style={{ margin: 10 }}
+                                message="Thông báo:"
+                                closable
+                                description="Vé của bạn đã hết hạn do quá thời gian thanh toán!!!"
+                                type="info"
+                            />
+                        </>
+                    }
                 </Spin>
             </Drawer>
             <Modal

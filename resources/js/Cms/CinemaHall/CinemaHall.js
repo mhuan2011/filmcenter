@@ -2,8 +2,8 @@ import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button, Image, Popconfirm, Space, Table, Tag } from 'antd';
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { openNotification } from '../../Client/Helper/Notification'; 
-import { AppContext } from '../../Context'; 
+import { openNotification } from '../../Client/Helper/Notification';
+import { AppContext } from '../../Context';
 
 const CinemaHall = () => {
   let navigate = useNavigate();
@@ -15,11 +15,11 @@ const CinemaHall = () => {
     getFilterCategory().then((res) => {
       setCategories(res.data.data);
     });
-    getListCinemalHall ().then((res) => {
+    getListCinemalHall().then((res) => {
       setData(res.data.data);
       setLoadingTable(false)
     });
-    
+
   }, [])
   const columns = [
     {
@@ -34,7 +34,7 @@ const CinemaHall = () => {
       key: 'name',
       width: 200,
     },
-    
+
     {
       title: 'Số ghế',
       dataIndex: 'total_seat',
@@ -48,6 +48,19 @@ const CinemaHall = () => {
       render: (_, record) => (
         <>{record.cinema.name}</>
       )
+    },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'status',
+      key: 'status',
+      width: 100,
+      render: (status) => {
+        return (
+          <>
+            {status ? 'Hoạt động' : 'Không hoạt động'}
+          </>
+        )
+      }
     },
     {
       title: 'Action',
